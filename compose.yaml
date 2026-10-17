@@ -1,0 +1,26 @@
+# Stack completo: `docker compose up --build`.
+include:
+  - compose.dev.yaml
+
+services:
+  api:
+    build: .
+    environment:
+      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/bibliomtr'
+      - 'SPRING_DATASOURCE_USERNAME=bibliomtr'
+      - 'SPRING_DATASOURCE_PASSWORD=bibliomtr'
+      - 'BIBLIOMTR_CORPUS_DIR=/data/corpus'
+    volumes:
+      - ./corpus:/data/corpus:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '8080:8080'
+
+  web:
+    build: ./web
+    depends_on:
+      - api
+    ports:
+      - '5173:80'

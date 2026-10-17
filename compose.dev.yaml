@@ -1,0 +1,25 @@
+# Base de datos de desarrollo. Spring Boot (spring-boot-docker-compose) levanta solo
+# este archivo en `./gradlew bootRun`; compose.yaml lo incluye para el stack completo.
+services:
+  db:
+    image: 'pgvector/pgvector:0.8.7-pg18'
+    environment:
+      - 'POSTGRES_DB=bibliomtr'
+      - 'POSTGRES_USER=bibliomtr'
+      - 'POSTGRES_PASSWORD=bibliomtr'
+    labels:
+      # La imagen no se llama "postgres": se indica el tipo de conexión a Spring Boot.
+      org.springframework.boot.service-connection: postgres
+    ports:
+      # Puerto de host aleatorio: Spring Boot lo descubre; consultar con `docker compose port db 5432`.
+      - '5432'
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bibliomtr -d bibliomtr']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db-data:

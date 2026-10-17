@@ -1,0 +1,9 @@
+.gradle
+build
+web
+corpus
+docs
+.claude
+.idea
+.vscode
+*.md
