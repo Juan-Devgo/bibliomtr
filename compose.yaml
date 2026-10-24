@@ -10,11 +10,14 @@ services:
       - 'SPRING_DATASOURCE_USERNAME=bibliomtr'
       - 'SPRING_DATASOURCE_PASSWORD=bibliomtr'
       - 'BIBLIOMTR_CORPUS_DIR=/data/corpus'
+      - 'BIBLIOMTR_OLLAMA_URL=http://ollama:11434'
     volumes:
       - ./corpus:/data/corpus:ro
     depends_on:
       db:
         condition: service_healthy
+      ollama:
+        condition: service_started
     ports:
       - '8080:8080'
 

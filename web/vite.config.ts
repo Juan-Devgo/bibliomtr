@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import path from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
@@ -16,5 +17,10 @@ export default defineConfig({
     proxy: {
       '/api': 'http://localhost:8080',
     },
+  },
+  // Vitest + Testing Library para los criterios de aceptación de la interfaz (spec 002).
+  test: {
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
   },
 })
