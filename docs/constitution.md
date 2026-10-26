@@ -1,5 +1,5 @@
 # Constitution
-Version: 1.0.0
+Version: 1.1.0
 
 ## 1. Mission
 Ejercicio académico de Análisis de Algoritmos (Universidad del Quindío, Ingeniería de Sistemas y Computación) que compara IA generativa (embeddings) y algoritmos clásicos de similitud textual en bibliometría sobre los abstracts de 20 artículos científicos. El código es evidencia de aprendizaje: MUST demostrar comprensión algorítmica, matemática y estadística, y nunca ser una caja negra.
@@ -9,7 +9,7 @@ Ejercicio académico de Análisis de Algoritmos (Universidad del Quindío, Ingen
 - P2. Las librerías MUST usarse solo para tareas auxiliares: lectura de PDF, graficación y carga de modelos de embeddings.
 - P3. Los modelos de embeddings MUST ser preentrenados, y la métrica de similitud sobre sus vectores MUST implementarse a mano.
 - P4. La IA generativa MUST usarse solo como apoyo, MUST NOT reemplazar el diseño algorítmico ni el análisis formal, y su uso MUST declararse explícitamente.
-- P5. El corpus MUST ser únicamente los 20 artículos PDF entregados por el docente, y el procesamiento MUST usar estrictamente el ABSTRACT de cada artículo.
+- P5. El corpus MUST ser únicamente los 20 artículos PDF entregados por el docente, y el procesamiento MUST usar estrictamente el ABSTRACT de cada artículo. Exception: el modelo SPECTER2 MAY recibir el título antepuesto al abstract (`título [SEP] abstract`), y ningún otro algoritmo ni modelo MUST usar el título.
 - P6. Cada algoritmo MUST corresponder fielmente a su definición formal, con las fórmulas documentadas (notación incluida) en docstrings o comentarios y verificables a mano contra los casos de estudio.
 - P7. El código MUST NOT ocultar pasos: las implementaciones MUST exponer los resultados intermedios (matrices, tablas, hashes, desplazamientos) para reproducirlos en la documentación.
 - P8. Todo módulo, clase y función pública MUST tener nombres descriptivos y un docstring que indique qué hace, por qué y su complejidad en tiempo y espacio, y los pasos no triviales MUST llevar comentarios.
@@ -23,3 +23,4 @@ Ejercicio académico de Análisis de Algoritmos (Universidad del Quindío, Ingen
 | Date | Version | Change |
 |---|---|---|
 | 2026-10-16 | 1.0.0 | Initial version |
+| 2026-10-23 | 1.1.0 | P5: excepción para que SPECTER2 reciba `título [SEP] abstract` |

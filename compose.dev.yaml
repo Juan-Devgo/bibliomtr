@@ -21,5 +21,15 @@ services:
       timeout: 5s
       retries: 10
 
+  # Ollama local para el embedding de nomic-embed-text (spec 001, REQ-9). Imagen con versión fijada
+  # (constitución P12); el modelo nomic-embed-text:v1.5 lo descarga la API con POST /api/pull.
+  ollama:
+    image: 'ollama/ollama:0.12.6'
+    ports:
+      - '11434:11434'
+    volumes:
+      - ollama-data:/root/.ollama
+
 volumes:
   db-data:
+  ollama-data:
