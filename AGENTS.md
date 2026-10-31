@@ -5,16 +5,18 @@
 - Jerarquía: `docs/constitution.md` > `docs/specs/###-name/spec.md` > `plan.md` > `tasks.md` > código. Cada nivel debe cumplir el de arriba.
 - Lee la constitución antes de planificar o programar. No se repite aquí.
 - Idioma: documentación, docstrings/Javadoc y comentarios en español; identificadores de código en inglés.
+- Requerimientos (numeración vigente): 1 similitud textual (spec 001), 2 ranking de términos con ordenamiento (spec 002, agregado con prioridad), 3 clustering jerárquico con dendrograma, 4 coincidencia exacta de cadenas (KMP, Boyer-Moore, Rabin-Karp), 5 despliegue y documentación técnica. El número de spec no tiene que coincidir con el del requerimiento; la correspondencia vive en `docs/traceability.md`.
+- El documento técnico (`docs/documento-tecnico.md`) lo redactan los estudiantes, no los agentes. El flujo SDD solo cubre constitución, specs, planes, tareas, trazabilidad y la guía de implementación; en trazabilidad la sección del documento queda `(pendiente)`.
 
 ## Stack
 - Backend: Java 25 (toolchain en `build.gradle.kts`), Spring Boot 4.1.x, Gradle Kotlin DSL (`./gradlew`), paquete base `co.edu.uniquindio.bibliomtr`.
 - Backend libs: Spring Web MVC, Validation, Data JPA, Actuator, springdoc-openapi, Lombok. Migraciones: Flyway.
 - PDF: Apache PDFBox, solo para extraer texto, título y autores.
 - Algoritmos: Java puro. MUST NOT usar Commons Text, Lucene, Smile ni Commons Math.
-- Embeddings: modelos sentence-transformers exportados a ONNX (p. ej. `all-MiniLM-L6-v2`) con ONNX Runtime o DJL, y Ollama local con `nomic-embed-text` vía HTTP (imagen y modelo con versión fijada). Solo generan vectores; la métrica de similitud se implementa a mano.
+- Embeddings: SPECTER2 exportado a ONNX, ejecutado con ONNX Runtime (el tokenizer de DJL solo tokeniza), y Ollama local con `nomic-embed-text` vía HTTP (imagen y modelo con versión fijada). Solo generan vectores; la métrica de similitud se implementa a mano.
 - Base de datos: PostgreSQL con extensión `vector`, imagen `pgvector/pgvector` en desarrollo y tests. Solo almacenamiento.
 - Pruebas: JUnit 5, AssertJ, Testcontainers (Postgres real).
-- Mediciones: JMH con calentamiento, solo en los requerimientos que lo piden (p. ej. 002 ranking de términos).
+- Mediciones: JMH con calentamiento, solo en los requerimientos que lo piden (p. ej. Req. 2, ranking de términos).
 - Frontend (`web/`): React + TypeScript + Vite, npm, TanStack Query, D3 (solo dibuja el dendrograma que devuelve el backend), KaTeX (`react-katex`), Recharts, MUI y shadcn/ui.
 - Despliegue: Docker Compose con `api`, `web`, `db` y `ollama`; en producción, Postgres gestionado con pgvector en RDS.
 
@@ -32,7 +34,7 @@ bibliomtr/
 ├── build.gradle.kts, settings.gradle.kts, gradlew   # backend
 ├── compose.yaml                                     # api + web + db + ollama
 ├── Dockerfile                                       # imagen de api
-├── docs/                                            # constitution.md, specs/###-name/, documento técnico
+├── docs/                                            # constitution.md, specs/###-name/, traceability.md, guia-implementacion.md, documento técnico (estudiantes)
 ├── src/
 │   ├── main/
 │   │   ├── java/co/edu/uniquindio/bibliomtr/
@@ -60,7 +62,7 @@ bibliomtr/
         ├── pages/
         └── types/              # tipos TS de las respuestas y trazas de la API
 ```
-- Un módulo por requerimiento; cada módulo se mapea a su demostración en el documento técnico (ver constitución).
+- Un módulo por requerimiento; cada módulo se mapea a su demostración en el documento técnico, registrada en `docs/traceability.md` (ver constitución P9).
 - Los módulos `pdf`, `preprocessing`, `algorithms`, `evaluation` no dependen de `api` ni de `persistence`.
 
 ## Conventions
