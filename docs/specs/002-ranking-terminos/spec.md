@@ -10,7 +10,7 @@
 - Applies:
   - P1: Counting Sort, Radix Sort y Bucket Sort (incluido el insertion sort de cada cubeta) se implementan a mano con arreglos y listas básicas; no se usan `Collections.sort`, `Arrays.sort` ni librerías de ordenamiento en producción. `TreeMap<String,Integer>` se acepta solo como estructura auxiliar para armar la entrada en orden alfabético descendente (REQ-2).
   - P2: JMH se usa solo para medir tiempos; Recharts solo para graficar.
-  - P4: las implementaciones se basan en el código de referencia entregado por el usuario; la IA generativa solo lo adapta a pares (término, frecuencia) y a la traza, y su uso se declara en el documento técnico.
+  - P4: las implementaciones se basan en el código de referencia entregado por el usuario; la IA generativa solo lo adapta a pares (término, frecuencia) y a la traza, y su uso lo declaran los estudiantes en el documento técnico.
   - P5: las frecuencias se calculan solo sobre los ABSTRACT del corpus de `corpus/`.
   - P6: cada algoritmo documenta su definición formal, fórmulas y notación (arreglo de conteo, acumulado, dígito `⌊v/exp⌋ mod 10`, índice de cubeta `⌊(v − min)/bucketSize⌋`).
   - P7: cada algoritmo devuelve una traza con sus resultados intermedios, expuesta por la API y la interfaz.

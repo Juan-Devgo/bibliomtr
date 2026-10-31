@@ -102,5 +102,5 @@
 - [x] T089 Ejecutar `./gradlew test` en verde y `./gradlew bootRun` hasta que arranque sin `NoSuchBeanDefinitionException` (REQ-1, AC-2)
 
 ## Phase 8: Documentación
-- [ ] T086 Escribir la sección "Requerimiento 2: Ranking de términos" (definiciones formales, fórmulas, trazas a mano de AC-9/10/11, complejidades, criterio de desempate, `bucketSize` default 5, parámetros JMH, referencia a `docs/referencias/ordenamiento/` y declaración de uso de IA) en `docs/documento-tecnico.md` (REQ-2, REQ-6, REQ-7, REQ-8, REQ-9, REQ-18, AC-9, AC-10, AC-11)
-- [ ] T087 Agregar las filas requerimiento → módulo → vista → sección → tests del Requerimiento 2 en `docs/traceability.md` (REQ-24, REQ-25, REQ-26)
+La sección "Requerimiento 2: Ranking de términos" de `docs/documento-tecnico.md` (definiciones formales, trazas a mano de AC-9/10/11, complejidades, criterio de desempate, `bucketSize` default 5, parámetros JMH, referencia a `docs/referencias/ordenamiento/` y declaración de uso de IA) la redactan los estudiantes, fuera del flujo SDD. El flujo SDD solo registra la trazabilidad.
+- [x] T087 Agregar las filas requerimiento → módulo → vista → sección → tests del Requerimiento 2 en `docs/traceability.md` (REQ-24, REQ-25, REQ-26)

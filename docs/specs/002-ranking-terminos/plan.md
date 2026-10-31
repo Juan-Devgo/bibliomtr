@@ -8,12 +8,12 @@
 ## 2. Constitution check
 - P1: `CountingSort`, `RadixSort` y `BucketSort` (con su insertion sort) se escriben a mano con `int[]`, arreglos de `TermFrequency` y `ArrayList`. `TreeMap<String,Integer>` solo aparece en `TermFrequencyCounter` (REQ-2). `ForbiddenSortUsageTest` lo verifica.
 - P2: JMH solo mide (`SortingBenchmark`, proceso hijo); Recharts solo dibuja las barras; KaTeX solo muestra fórmulas; Jackson solo lee el JSON de JMH.
-- P4: las implementaciones adaptan, sin cambiar la lógica, el código de referencia `docs/referencias/ordenamiento/{CountingSort,RadixSort,BucketSort}.java` (textual del usuario, fuera de `src/`, no se compila). El único cambio de lógica es `Collections.sort` → insertion sort (conflicto P1 de la spec). El uso de IA se declara en `docs/documento-tecnico.md`.
+- P4: las implementaciones adaptan, sin cambiar la lógica, el código de referencia `docs/referencias/ordenamiento/{CountingSort,RadixSort,BucketSort}.java` (textual del usuario, fuera de `src/`, no se compila). El único cambio de lógica es `Collections.sort` → insertion sort (conflicto P1 de la spec). El uso de IA lo declaran los estudiantes en `docs/documento-tecnico.md`.
 - P5: las frecuencias salen solo de los abstracts seleccionables, a través del puerto `CorpusTokenSource` sobre la ingesta de la spec 001.
 - P6: el Javadoc de cada algoritmo y `docs/documento-tecnico.md` documentan la definición formal y la notación: conteo `C[v]`, acumulado `C[v] += C[v−1]`, dígito `⌊v/exp⌋ mod 10`, número de cubetas `⌊(max − min)/bucketSize⌋ + 1`, índice `⌊(v − min)/bucketSize⌋`. Las vistas de traza muestran las mismas fórmulas en KaTeX.
 - P7: cada `TermSorter` devuelve `SortResult` con su traza (`trace/ranking`), expuesta en `GET /api/ranking/trace/{algorithm}` y mostrada paso a paso en `web/src/features/sort-trace`.
 - P8: todo tipo y método público lleva Javadoc en español con qué, por qué y complejidad: Counting O(n+k) en tiempo y espacio, k = frecuencia máxima; Radix O(d·(n+b)) en tiempo y O(n+b) en espacio, d = dígitos del máximo, b = 10; Bucket O(n+m) promedio y O(n²) peor caso en tiempo, O(n+m) en espacio, m = número de cubetas.
-- P9: `docs/traceability.md` recibe una fila por módulo y `docs/documento-tecnico.md` la sección "Requerimiento 2: Ranking de términos".
+- P9: `docs/traceability.md` recibe una fila por módulo, con la sección "Requerimiento 2: Ranking de términos" de `docs/documento-tecnico.md` marcada `(pendiente)`; los estudiantes redactan esa sección.
 - P10: tests a mano (AC-9, AC-10, AC-11) y casos de borde aplicables (vacía, un término, frecuencias iguales, ya ordenada, inversa, k ≫ n), según la resolución de conflicto de la spec.
 - P11: `RankingResponse` reporta `preprocessingMs` y `elapsedMs` por algoritmo, medidos sin traza; JMH guarda ms ± scoreError junto a la complejidad teórica.
 - P12: reutiliza el preprocesador de la 001; los parámetros JMH quedan fijos en las anotaciones de `SortingBenchmark`, en los argumentos de `JmhProcessLauncher` y en `build.gradle.kts`; las dependencias de frontend quedan fijadas en `package-lock.json`.
@@ -104,7 +104,6 @@ Frontend (`web/`):
 - modify: `src/App.tsx` - MUI `Tabs` entre `HomePage` y `TermRankingPage`.
 
 Documentación:
-- create: `docs/documento-tecnico.md` - sección "Requerimiento 2: Ranking de términos".
 - modify: `docs/traceability.md` - filas del Requerimiento 2.
 
 ## 6. Interfaces and data
