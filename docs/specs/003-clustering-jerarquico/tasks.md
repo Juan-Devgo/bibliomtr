@@ -14,12 +14,12 @@
 - [x] T011 Actualizar las descripciones de `studentTest` y `scaffoldTest` en `build.gradle.kts` y verificar `./gradlew test` en verde y `./gradlew scaffoldTest` en verde (REQ-9, AC-3)
 
 ## Phase 2: Tests de estudiante
-- [ ] T012 Crear `ClusteringCases` con D₄, 2 artículos, idénticos, empates, 20 artículos con `Random(42)` y aserciones estructurales en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/ClusteringCases.java` (REQ-8)
-- [ ] T013 Crear `SingleLinkageTest` con `@Tag("student")` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/SingleLinkageTest.java` (REQ-8, REQ-16, AC-5, AC-6, AC-7, AC-8, AC-9)
-- [ ] T014 Crear `CompleteLinkageTest` con `@Tag("student")` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/CompleteLinkageTest.java` (REQ-8, REQ-16, AC-5, AC-6, AC-7, AC-8, AC-9)
-- [ ] T015 Crear `AverageLinkageTest` con `@Tag("student")` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/AverageLinkageTest.java` (REQ-8, REQ-16, AC-5, AC-6, AC-7, AC-8, AC-9)
-- [ ] T016 Crear `DianaTest` con `@Tag("student")` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/DianaTest.java` (REQ-8, REQ-16, AC-5, AC-6, AC-7, AC-8, AC-9)
-- [ ] T017 Verificar que `./gradlew studentTest --tests '*LinkageTest' --tests DianaTest` falla en todos los casos y `./gradlew test` sigue en verde (REQ-9, AC-3, AC-4)
+- [x] T012 Crear `ClusteringCases` con D₄, 2 artículos, idénticos, empates, 20 artículos con `Random(42)` y aserciones estructurales en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/ClusteringCases.java` (REQ-8)
+- [x] T013 Crear `SingleLinkageTest` con `@Tag("student")` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/SingleLinkageTest.java` (REQ-8, REQ-16, AC-5, AC-6, AC-7, AC-8, AC-9)
+- [x] T014 Crear `CompleteLinkageTest` con `@Tag("student")` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/CompleteLinkageTest.java` (REQ-8, REQ-16, AC-5, AC-6, AC-7, AC-8, AC-9)
+- [x] T015 Crear `AverageLinkageTest` con `@Tag("student")` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/AverageLinkageTest.java` (REQ-8, REQ-16, AC-5, AC-6, AC-7, AC-8, AC-9)
+- [x] T016 Crear `DianaTest` con `@Tag("student")` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/DianaTest.java` (REQ-8, REQ-16, AC-5, AC-6, AC-7, AC-8, AC-9)
+- [x] T017 Verificar que `./gradlew studentTest --tests '*LinkageTest' --tests DianaTest` falla en todos los casos y `./gradlew test` sigue en verde (REQ-9, AC-3, AC-4)
 
 ## Phase 3: API de clustering
 - [ ] T018 Agregar `similarityMatrix` y `SourceMatrix` reutilizando el código privado de `compare` en `src/main/java/co/edu/uniquindio/bibliomtr/api/similarity/ComparisonService.java` (REQ-10)
