@@ -70,10 +70,10 @@
 - [x] T059 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `feat: visor de traza de la búsqueda de patrones (fase 5 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
 
 ## Phase 6: Benchmarks JMH
-- [ ] T060 Crear `StringMatchingBenchmark` (KMP y Boyer-Moore, un `@State` por algoritmo, preprocesamiento y búsqueda por separado) en `src/jmh/java/co/edu/uniquindio/bibliomtr/evaluation/StringMatchingBenchmark.java` (REQ-30, AC-22)
-- [ ] T061 Crear `RabinKarpBenchmark` con `@Param q` en `src/jmh/java/co/edu/uniquindio/bibliomtr/evaluation/RabinKarpBenchmark.java` (REQ-30, AC-22)
-- [ ] T062 Verificar `./gradlew jmhJar` y `./gradlew test` en verde (REQ-30, AC-4)
-- [ ] T063 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `feat: benchmarks JMH de la búsqueda de patrones (fase 6 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+- [x] T060 Crear `StringMatchingBenchmark` (KMP y Boyer-Moore, un `@State` por algoritmo, preprocesamiento y búsqueda por separado) en `src/jmh/java/co/edu/uniquindio/bibliomtr/evaluation/StringMatchingBenchmark.java` (REQ-30, AC-22)
+- [x] T061 Crear `RabinKarpBenchmark` con `@Param q` en `src/jmh/java/co/edu/uniquindio/bibliomtr/evaluation/RabinKarpBenchmark.java` (REQ-30, AC-22)
+- [x] T062 Verificar `./gradlew jmhJar` y `./gradlew test` en verde (REQ-30, AC-4)
+- [x] T063 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `feat: benchmarks JMH de la búsqueda de patrones (fase 6 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
 
 ## Phase 7: Guía, trazabilidad y README
 - [ ] T064 Agregar la sección "## 11. Requerimiento 4: Coincidencia exacta de cadenas" con un apartado por stub, el ejemplo del fragmento real, el comando JMH y la declaración de IA, sin tocar § 10, en `docs/guia-implementacion.md` (REQ-31, REQ-32, AC-22, AC-23)
