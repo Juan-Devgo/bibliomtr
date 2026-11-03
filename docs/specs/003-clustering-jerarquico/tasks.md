@@ -22,17 +22,17 @@
 - [x] T017 Verificar que `./gradlew studentTest --tests '*LinkageTest' --tests DianaTest` falla en todos los casos y `./gradlew test` sigue en verde (REQ-9, AC-3, AC-4)
 
 ## Phase 3: API de clustering
-- [ ] T018 Agregar `similarityMatrix` y `SourceMatrix` reutilizando el código privado de `compare` en `src/main/java/co/edu/uniquindio/bibliomtr/api/similarity/ComparisonService.java` (REQ-10)
-- [ ] T019 Agregar `fromSource` en `src/main/java/co/edu/uniquindio/bibliomtr/api/similarity/ComparisonAlgorithm.java` (REQ-12, AC-12)
-- [ ] T020 Crear `ClusteringAlgorithm` y `ClusteringCatalog` en `src/main/java/co/edu/uniquindio/bibliomtr/api/clustering/` (REQ-11, REQ-18)
-- [ ] T021 Crear el bean `ClusteringCatalog` con los 4 stubs en `src/main/java/co/edu/uniquindio/bibliomtr/config/ClusteringConfig.java` (REQ-11)
-- [ ] T022 Crear `ClusteringDtos` en `src/main/java/co/edu/uniquindio/bibliomtr/api/clustering/ClusteringDtos.java` (REQ-11, REQ-19, REQ-22)
-- [ ] T023 Crear `ClusteringService` (D = 1 − S, diagonal 0, PENDIENTE de fuente y de algoritmo, validación y tiempos) en `src/main/java/co/edu/uniquindio/bibliomtr/api/clustering/ClusteringService.java` (REQ-7, REQ-10, REQ-11, REQ-16, REQ-18, REQ-19, REQ-22)
-- [ ] T024 Crear `ClusteringController` con `POST /api/clustering` y `GET /api/clustering/trace` en `src/main/java/co/edu/uniquindio/bibliomtr/api/clustering/ClusteringController.java` (REQ-11, REQ-16)
-- [ ] T025 Manejar `InvalidDendrogramException` como 500 con mensaje en español en `src/main/java/co/edu/uniquindio/bibliomtr/api/ApiExceptionHandler.java` (REQ-7, AC-10)
-- [ ] T026 Crear `FakeClusteringCatalog` en `src/test/java/co/edu/uniquindio/bibliomtr/api/clustering/FakeClusteringCatalog.java` (REQ-11, REQ-18)
-- [ ] T027 Crear `ClusteringApiIT` en `src/test/java/co/edu/uniquindio/bibliomtr/api/clustering/ClusteringApiIT.java` (REQ-7, REQ-10, REQ-11, REQ-12, REQ-16, REQ-18, REQ-19, REQ-22, AC-10, AC-11, AC-12, AC-15, AC-16, AC-17, AC-19)
-- [ ] T028 Verificar `./gradlew test` en verde, incluido `ComparisonApiIT` (REQ-10, AC-3)
+- [x] T018 Agregar `similarityMatrix` y `SourceMatrix` reutilizando el código privado de `compare` en `src/main/java/co/edu/uniquindio/bibliomtr/api/similarity/ComparisonService.java` (REQ-10)
+- [x] T019 Agregar `fromSource` en `src/main/java/co/edu/uniquindio/bibliomtr/api/similarity/ComparisonAlgorithm.java` (REQ-12, AC-12)
+- [x] T020 Crear `ClusteringAlgorithm` y `ClusteringCatalog` en `src/main/java/co/edu/uniquindio/bibliomtr/api/clustering/` (REQ-11, REQ-18)
+- [x] T021 Crear el bean `ClusteringCatalog` con los 4 stubs en `src/main/java/co/edu/uniquindio/bibliomtr/config/ClusteringConfig.java` (REQ-11)
+- [x] T022 Crear `ClusteringDtos` en `src/main/java/co/edu/uniquindio/bibliomtr/api/clustering/ClusteringDtos.java` (REQ-11, REQ-19, REQ-22)
+- [x] T023 Crear `ClusteringService` (D = 1 − S, diagonal 0, PENDIENTE de fuente y de algoritmo, validación y tiempos) en `src/main/java/co/edu/uniquindio/bibliomtr/api/clustering/ClusteringService.java` (REQ-7, REQ-10, REQ-11, REQ-16, REQ-18, REQ-19, REQ-22)
+- [x] T024 Crear `ClusteringController` con `POST /api/clustering` y `GET /api/clustering/trace` en `src/main/java/co/edu/uniquindio/bibliomtr/api/clustering/ClusteringController.java` (REQ-11, REQ-16)
+- [x] T025 Manejar `InvalidDendrogramException` como 500 con mensaje en español en `src/main/java/co/edu/uniquindio/bibliomtr/api/ApiExceptionHandler.java` (REQ-7, AC-10)
+- [x] T026 Crear `FakeClusteringCatalog` en `src/test/java/co/edu/uniquindio/bibliomtr/api/clustering/FakeClusteringCatalog.java` (REQ-11, REQ-18)
+- [x] T027 Crear `ClusteringApiIT` en `src/test/java/co/edu/uniquindio/bibliomtr/api/clustering/ClusteringApiIT.java` (REQ-7, REQ-10, REQ-11, REQ-12, REQ-16, REQ-18, REQ-19, REQ-22, AC-10, AC-11, AC-12, AC-15, AC-16, AC-17, AC-19)
+- [x] T028 Verificar `./gradlew test` en verde, incluido `ComparisonApiIT` (REQ-10, AC-3)
 
 ## Phase 4: Sección de dendrogramas en la interfaz
 - [ ] T029 Crear los tipos en `web/src/types/clustering.ts` (REQ-11, REQ-16)

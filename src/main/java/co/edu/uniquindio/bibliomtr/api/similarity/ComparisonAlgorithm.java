@@ -133,4 +133,28 @@ public enum ComparisonAlgorithm {
 		throw new IllegalArgumentException("Algoritmo desconocido: " + slug + ". Valores válidos: " + valid);
 	}
 
+	/**
+	 * Busca la fuente de similitud del clustering jerárquico por su slug (spec 003, REQ-12).
+	 *
+	 * <p>Complejidad: O(1) en tiempo y espacio (8 valores).
+	 *
+	 * @param slug p. ej. {@code specter2-cosine}
+	 * @return el resultado del Requerimiento 1 que da la similitud
+	 * @throws IllegalArgumentException si el slug es nulo, vacío o desconocido, con el mensaje en español de la
+	 *                                  API (HTTP 400)
+	 */
+	public static ComparisonAlgorithm fromSource(String slug) {
+		if (slug == null || slug.isBlank()) {
+			throw new IllegalArgumentException("Debe indicar la fuente de similitud (source)");
+		}
+		StringJoiner valid = new StringJoiner(", ");
+		for (ComparisonAlgorithm algorithm : values()) {
+			if (algorithm.slug.equals(slug)) {
+				return algorithm;
+			}
+			valid.add(algorithm.slug);
+		}
+		throw new IllegalArgumentException("Fuente de similitud desconocida: " + slug + ". Valores válidos: " + valid);
+	}
+
 }
