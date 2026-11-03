@@ -8,6 +8,7 @@ import AlgorithmSelector, { defaultAlgorithm } from './AlgorithmSelector'
 import HighlightedAbstract from './HighlightedAbstract'
 import PatternSearchForm from './PatternSearchForm'
 import PatternSearchResults from './PatternSearchResults'
+import PatternTraceView from './PatternTraceView'
 
 /**
  * Algoritmo resaltado: el elegido si sigue CALCULADO en la respuesta; si no, el de `defaultAlgorithm`.
@@ -22,7 +23,10 @@ function highlightedAlgorithm(
   return result && result.status === 'CALCULADO' ? result.algorithm : defaultAlgorithm(response)
 }
 
-/** Abstract del artículo elegido con las posiciones del algoritmo del selector (REQ-20, AC-15). */
+/**
+ * Abstract del artículo elegido con las posiciones del algoritmo del selector (REQ-20, AC-15) y la traza de ese
+ * algoritmo sobre ese abstract, con el patrón y el q de la búsqueda (REQ-22, REQ-26).
+ */
 function ArticleHighlight({
   response,
   articleId,
@@ -59,6 +63,12 @@ function ArticleHighlight({
         patternLength={response.pattern.length}
         algorithmLabel={result.label}
       />
+      <PatternTraceView
+        algorithm={algorithm}
+        articleId={article.articleId}
+        pattern={response.pattern}
+        q={String(response.q)}
+      />
     </Stack>
   )
 }
@@ -68,8 +78,9 @@ function ArticleHighlight({
  *
  * El formulario envía el patrón y q; los resultados muestran por algoritmo los tiempos, el total y la tabla de
  * ocurrencias por artículo. Al elegir una fila se muestra el abstract de ese artículo con las posiciones del
- * algoritmo del selector (por defecto el primer implementado en el orden KMP, Boyer-Moore, Rabin-Karp). Cada
- * búsqueda nueva limpia el artículo elegido, porque el resultado cambia; el algoritmo elegido se conserva si sigue
+ * algoritmo del selector (por defecto el primer implementado en el orden KMP, Boyer-Moore, Rabin-Karp) y, debajo,
+ * la traza paso a paso de ese algoritmo sobre ese abstract (`PatternTraceView`). Cada búsqueda nueva limpia el
+ * artículo elegido, porque el resultado cambia; el algoritmo elegido se conserva si sigue
  * implementado. La vista no busca ni compara el patrón con el texto: solo dibuja las posiciones de la API.
  *
  * Complejidad por render: la de `PatternSearchResults` más O(n + k) del abstract elegido.

@@ -3,28 +3,48 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   ALL_IMPLEMENTED,
+  BOYER_MOORE_TRACE_ABAB,
   EMPTY_CORPUS,
   FIXTURE_POSITIONS,
+  KMP_TRACE_ABAB,
   ONLY_KMP,
+  RABIN_KARP_TRACE_ABAB,
   STRING_MATCHING_STUB_DIRECTORY,
 } from '@/test/patternSearchFixtures'
 import { renderWithQuery } from '@/test/setup'
-import type { PatternSearchResponse } from '@/types/patternSearch'
+import type { PatternSearchResponse, PatternTraceResponse, StringMatchingSlug } from '@/types/patternSearch'
 import PatternSearchView from './PatternSearchView'
 
-/** API simulada: cada llamada a `fetch` responde `body` con el código `status`. */
+/** Trazas de "abababca"/"abab" por algoritmo, para la traza que se pide al elegir un artículo. */
+const TRACES: Record<StringMatchingSlug, PatternTraceResponse> = {
+  kmp: KMP_TRACE_ABAB,
+  'boyer-moore': BOYER_MOORE_TRACE_ABAB,
+  'rabin-karp': RABIN_KARP_TRACE_ABAB,
+}
+
+/**
+ * API simulada: cada búsqueda responde `body` con el código `status`; la traza responde la de su algoritmo
+ * (`TRACES`), que estas pruebas no revisan (las cubre `PatternTraceView.test.tsx`).
+ */
 function mockFetch(body: PatternSearchResponse | { status: number; detail: string }, status = 200) {
-  const fetchMock = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => Response.json(body, { status }))
+  const fetchMock = vi.fn(async (input: RequestInfo | URL, _init?: RequestInit) => {
+    const url = new URL(String(input), 'http://localhost')
+    if (url.pathname === '/api/pattern-search/trace') {
+      return Response.json(TRACES[url.searchParams.get('algorithm') as StringMatchingSlug])
+    }
+    return Response.json(body, { status })
+  })
   vi.stubGlobal('fetch', fetchMock)
   return fetchMock
 }
 
 /** Parámetros de la última consulta a `GET /api/pattern-search`, ya decodificados. */
 function lastQuery(fetchMock: ReturnType<typeof mockFetch>): URLSearchParams {
-  const calls = fetchMock.mock.calls
-  const url = new URL(String(calls[calls.length - 1][0]), 'http://localhost')
-  expect(url.pathname).toBe('/api/pattern-search')
-  return url.searchParams
+  const urls = fetchMock.mock.calls
+    .map((call) => new URL(String(call[0]), 'http://localhost'))
+    .filter((url) => url.pathname === '/api/pattern-search')
+  expect(urls.length).toBeGreaterThan(0)
+  return urls[urls.length - 1].searchParams
 }
 
 /** Escribe `pattern` (y `q` si viene) y pulsa "Buscar". */

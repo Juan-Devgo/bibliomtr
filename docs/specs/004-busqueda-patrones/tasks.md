@@ -57,17 +57,17 @@
 - [x] T048 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `feat: pestaña Búsqueda Patrones (fase 4 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
 
 ## Phase 5: Visor de traza de la búsqueda de patrones
-- [ ] T049 Agregar a `web/src/test/patternSearchFixtures.ts` las trazas de "abababca"/"abab" de los 3 algoritmos, la de colisión "abba"/"ab" con q = 3 y una pendiente (REQ-23, REQ-24, REQ-25, REQ-28)
-- [ ] T050 Crear `traceSteps.test.ts` en `web/src/features/pattern-search/` (REQ-26, AC-16, AC-17, AC-18)
-- [ ] T051 Crear `toFrames` en `web/src/features/pattern-search/traceSteps.ts` (REQ-21, REQ-26, AC-16, AC-17, AC-18)
-- [ ] T052 Crear las fórmulas KaTeX en `web/src/features/pattern-search/patternFormulas.ts` (REQ-26)
-- [ ] T053 Crear `StepNavigator` y `AlignedWindow` en `web/src/features/pattern-search/` (REQ-26, AC-16, AC-17)
-- [ ] T054 Crear `TraceChart` con Recharts en `web/src/features/pattern-search/TraceChart.tsx` (REQ-27, AC-16, AC-17, AC-18)
-- [ ] T055 Crear `KmpTraceView`, `BoyerMooreTraceView` y `RabinKarpTraceView` en `web/src/features/pattern-search/` (REQ-23, REQ-24, REQ-25, REQ-26, REQ-27, AC-16, AC-17, AC-18)
-- [ ] T056 Crear `PatternTraceView` con el aviso de pendiente y conectarlo al algoritmo y artículo elegidos en `web/src/features/pattern-search/PatternTraceView.tsx` y `PatternSearchView.tsx` (REQ-22, REQ-26, REQ-28, AC-26)
-- [ ] T057 Crear `PatternTraceView.test.tsx` en `web/src/features/pattern-search/` (REQ-23, REQ-24, REQ-25, REQ-26, REQ-27, REQ-28, AC-16, AC-17, AC-18, AC-26)
-- [ ] T058 Verificar `npm test`, `npm run lint` y `npm run build` en `web/` y `./gradlew test` en verde (REQ-14, REQ-21, AC-2)
-- [ ] T059 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `feat: visor de traza de la búsqueda de patrones (fase 5 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+- [x] T049 Agregar a `web/src/test/patternSearchFixtures.ts` las trazas de "abababca"/"abab" de los 3 algoritmos, la de colisión "abba"/"ab" con q = 3 y una pendiente (REQ-23, REQ-24, REQ-25, REQ-28)
+- [x] T050 Crear `traceSteps.test.ts` en `web/src/features/pattern-search/` (REQ-26, AC-16, AC-17, AC-18)
+- [x] T051 Crear `toFrames` en `web/src/features/pattern-search/traceSteps.ts` (REQ-21, REQ-26, AC-16, AC-17, AC-18)
+- [x] T052 Crear las fórmulas KaTeX en `web/src/features/pattern-search/patternFormulas.ts` (REQ-26)
+- [x] T053 Crear `StepNavigator` y `AlignedWindow` en `web/src/features/pattern-search/` (REQ-26, AC-16, AC-17)
+- [x] T054 Crear `TraceChart` con Recharts en `web/src/features/pattern-search/TraceChart.tsx` (REQ-27, AC-16, AC-17, AC-18)
+- [x] T055 Crear `KmpTraceView`, `BoyerMooreTraceView` y `RabinKarpTraceView` en `web/src/features/pattern-search/` (REQ-23, REQ-24, REQ-25, REQ-26, REQ-27, AC-16, AC-17, AC-18)
+- [x] T056 Crear `PatternTraceView` con el aviso de pendiente y conectarlo al algoritmo y artículo elegidos en `web/src/features/pattern-search/PatternTraceView.tsx` y `PatternSearchView.tsx` (REQ-22, REQ-26, REQ-28, AC-26)
+- [x] T057 Crear `PatternTraceView.test.tsx` en `web/src/features/pattern-search/` (REQ-23, REQ-24, REQ-25, REQ-26, REQ-27, REQ-28, AC-16, AC-17, AC-18, AC-26)
+- [x] T058 Verificar `npm test`, `npm run lint` y `npm run build` en `web/` y `./gradlew test` en verde (REQ-14, REQ-21, AC-2)
+- [x] T059 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `feat: visor de traza de la búsqueda de patrones (fase 5 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
 
 ## Phase 6: Benchmarks JMH
 - [ ] T060 Crear `StringMatchingBenchmark` (KMP y Boyer-Moore, un `@State` por algoritmo, preprocesamiento y búsqueda por separado) en `src/jmh/java/co/edu/uniquindio/bibliomtr/evaluation/StringMatchingBenchmark.java` (REQ-30, AC-22)
