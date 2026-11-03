@@ -9,12 +9,14 @@ import HomePage from '@/pages/HomePage'
 // bundle inicial.
 const SimilarityPage = lazy(() => import('@/pages/SimilarityPage'))
 const TermRankingPage = lazy(() => import('@/pages/TermRankingPage'))
+const PatternSearchPage = lazy(() => import('@/pages/PatternSearchPage'))
 
 /** Pestañas de la aplicación; se agrega una por requerimiento. */
 const TABS = [
   { id: 'home', label: 'Inicio' },
   { id: 'similarity', label: 'Similitud textual' },
   { id: 'term-ranking', label: 'Ranking de términos' },
+  { id: 'pattern-search', label: 'Búsqueda Patrones' },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
@@ -24,11 +26,12 @@ const PAGES: Record<TabId, ComponentType> = {
   home: HomePage,
   similarity: SimilarityPage,
   'term-ranking': TermRankingPage,
+  'pattern-search': PatternSearchPage,
 }
 
 /**
- * Raíz de la interfaz: pestañas MUI entre la página inicial, la de similitud textual (spec 001, REQ-17) y la
- * del ranking de términos (spec 002, REQ-5).
+ * Raíz de la interfaz: pestañas MUI entre la página inicial, la de similitud textual (spec 001, REQ-17), la
+ * del ranking de términos (spec 002, REQ-5) y la de búsqueda de patrones (spec 004, REQ-19).
  */
 function App() {
   const [tab, setTab] = useState<TabId>('home')

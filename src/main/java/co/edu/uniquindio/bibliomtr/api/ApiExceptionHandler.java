@@ -16,12 +16,14 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import co.edu.uniquindio.bibliomtr.algorithms.clustering.InvalidDendrogramException;
+import co.edu.uniquindio.bibliomtr.algorithms.stringmatching.InvalidMatchPositionsException;
 import co.edu.uniquindio.bibliomtr.api.benchmark.BenchmarkInProgressException;
 import co.edu.uniquindio.bibliomtr.api.similarity.ArticleSelectionValidator;
 
 /**
  * Traduce los errores de la API a respuestas {@link ProblemDetail} (RFC 9457) con el mensaje en español en
- * {@code detail} (spec 002: REQ-4, AC-3; REQ-19, AC-14. Spec 001: REQ-15, AC-14. Spec 003: REQ-7, AC-10).
+ * {@code detail} (spec 002: REQ-4, AC-3; REQ-19, AC-14. Spec 001: REQ-15, AC-14. Spec 003: REQ-7, AC-10. Spec 004:
+ * REQ-8, REQ-17, REQ-22, AC-3, AC-13, AC-19).
  *
  * <p><b>Casos.</b>
  * <ul>
@@ -41,6 +43,10 @@ import co.edu.uniquindio.bibliomtr.api.similarity.ArticleSelectionValidator;
  *       "Ya hay una medición en curso".</li>
  *   <li>Dendrograma inválido de un algoritmo de clustering implementado: {@link InvalidDendrogramException} →
  *       500 con "El algoritmo &lt;slug&gt; devolvió un dendrograma inválido: &lt;razón&gt;".</li>
+ *   <li>Posiciones inválidas de un algoritmo de búsqueda de patrones implementado:
+ *       {@link InvalidMatchPositionsException} → 500 con "El algoritmo &lt;slug&gt; devolvió posiciones inválidas
+ *       en el artículo &lt;id&gt;: &lt;razón&gt;". Los errores de patrón, q, algoritmo o artículo de la búsqueda de
+ *       patrones son {@link IllegalArgumentException} (400).</li>
  * </ul>
  * Los parámetros validados de la API ({@code n}, {@code bucketSize}) son enteros mayores o iguales a 1, de
  * ahí el mensaje "El parámetro &lt;nombre&gt; debe ser un entero mayor o igual a 1".
@@ -147,6 +153,22 @@ public class ApiExceptionHandler {
 	 */
 	@ExceptionHandler(InvalidDendrogramException.class)
 	public ProblemDetail handleInvalidDendrogram(InvalidDendrogramException exception) {
+		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
+				exception.getMessage());
+		problem.setTitle("Error interno");
+		return problem;
+	}
+
+	/**
+	 * Posiciones inválidas devueltas por un algoritmo de búsqueda de patrones implementado (spec 004, REQ-8, AC-3).
+	 *
+	 * <p>Complejidad: O(1) en tiempo y espacio.
+	 *
+	 * @param exception rechazo de {@code MatchPositionsValidator} con la razón en español
+	 * @return 500 con ese mensaje
+	 */
+	@ExceptionHandler(InvalidMatchPositionsException.class)
+	public ProblemDetail handleInvalidMatchPositions(InvalidMatchPositionsException exception) {
 		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
 				exception.getMessage());
 		problem.setTitle("Error interno");
