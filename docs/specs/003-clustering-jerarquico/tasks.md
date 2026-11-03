@@ -1,17 +1,17 @@
 # Tasks: Entorno para el Requerimiento 3: Clustering jerárquico con dendrograma
 
 ## Phase 1: Contratos, stubs y validación del dendrograma
-- [ ] T001 Crear el Javadoc del módulo en `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/package-info.java` (REQ-4)
-- [ ] T002 Crear `Merge`, `ClusteringResult` y `HierarchicalClustering` en `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/` (REQ-3)
-- [ ] T003 Crear `LinkageTrace` y `DianaTrace` con copias defensivas en `src/main/java/co/edu/uniquindio/bibliomtr/trace/clustering/` y su `package-info.java` (REQ-16)
-- [ ] T004 Crear los stubs `SingleLinkage`, `CompleteLinkage` y `AverageLinkage` con Javadoc (Qué calcula, Fórmula, Desempate, Traza, Rango, Casos de borde, Complejidad: TODO estudiante) en `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/` (REQ-1, REQ-4, REQ-5, REQ-6, AC-1)
-- [ ] T005 Crear el stub `Diana` con el mismo Javadoc y la regla de divisiones en `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/Diana.java` (REQ-2, REQ-4, REQ-5, REQ-6, AC-1)
-- [ ] T006 Crear `InvalidDendrogramException` y `DendrogramValidator` en `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/` (REQ-7, AC-10)
-- [ ] T007 Crear `DendrogramValidatorTest` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/DendrogramValidatorTest.java` (REQ-7, AC-10)
-- [ ] T008 Crear `ClusteringStubScaffoldTest` con `@Tag("scaffold")` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/ClusteringStubScaffoldTest.java` (REQ-1, REQ-2, REQ-6, AC-1)
-- [ ] T009 Crear `ClusteringStubDocumentationTest` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/ClusteringStubDocumentationTest.java` (REQ-4, REQ-5, AC-18)
-- [ ] T010 Crear `ForbiddenClusteringUsageTest` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/ForbiddenClusteringUsageTest.java` (REQ-6, REQ-15, AC-2)
-- [ ] T011 Actualizar las descripciones de `studentTest` y `scaffoldTest` en `build.gradle.kts` y verificar `./gradlew test` en verde y `./gradlew scaffoldTest` en verde (REQ-9, AC-3)
+- [x] T001 Crear el Javadoc del módulo en `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/package-info.java` (REQ-4)
+- [x] T002 Crear `Merge`, `ClusteringResult` y `HierarchicalClustering` en `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/` (REQ-3)
+- [x] T003 Crear `LinkageTrace` y `DianaTrace` con copias defensivas en `src/main/java/co/edu/uniquindio/bibliomtr/trace/clustering/` y su `package-info.java` (REQ-16)
+- [x] T004 Crear los stubs `SingleLinkage`, `CompleteLinkage` y `AverageLinkage` con Javadoc (Qué calcula, Fórmula, Desempate, Traza, Rango, Casos de borde, Complejidad: TODO estudiante) en `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/` (REQ-1, REQ-4, REQ-5, REQ-6, AC-1)
+- [x] T005 Crear el stub `Diana` con el mismo Javadoc y la regla de divisiones en `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/Diana.java` (REQ-2, REQ-4, REQ-5, REQ-6, AC-1)
+- [x] T006 Crear `InvalidDendrogramException` y `DendrogramValidator` en `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/` (REQ-7, AC-10)
+- [x] T007 Crear `DendrogramValidatorTest` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/DendrogramValidatorTest.java` (REQ-7, AC-10)
+- [x] T008 Crear `ClusteringStubScaffoldTest` con `@Tag("scaffold")` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/ClusteringStubScaffoldTest.java` (REQ-1, REQ-2, REQ-6, AC-1)
+- [x] T009 Crear `ClusteringStubDocumentationTest` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/ClusteringStubDocumentationTest.java` (REQ-4, REQ-5, AC-18)
+- [x] T010 Crear `ForbiddenClusteringUsageTest` en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/ForbiddenClusteringUsageTest.java` (REQ-6, REQ-15, AC-2)
+- [x] T011 Actualizar las descripciones de `studentTest` y `scaffoldTest` en `build.gradle.kts` y verificar `./gradlew test` en verde y `./gradlew scaffoldTest` en verde (REQ-9, AC-3)
 
 ## Phase 2: Tests de estudiante
 - [ ] T012 Crear `ClusteringCases` con D₄, 2 artículos, idénticos, empates, 20 artículos con `Random(42)` y aserciones estructurales en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/ClusteringCases.java` (REQ-8)
