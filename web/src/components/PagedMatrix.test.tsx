@@ -45,7 +45,8 @@ describe('PagedMatrix (REQ-17, AC-15)', () => {
     expect(within(section).getByText('29,29')).toBeInTheDocument()
     expect(within(section).getByRole('button', { name: 'Matriz D: filas siguientes' })).toBeDisabled()
     expect(within(section).getByRole('button', { name: 'Matriz D: columnas siguientes' })).toBeDisabled()
-  })
+    // Consultar 625 celdas por rol tarda ~1,6 s solo; con la suite completa en paralelo supera los 5 s por defecto.
+  }, 20_000)
 
   it('muestra completa una matriz de 5×5, sin botones de bloque', () => {
     render(<PagedMatrix matrix={indexMatrix(5, 5)} rowLabels={labels('r', 5)} colLabels={labels('c', 5)} label="Matriz F" />)
