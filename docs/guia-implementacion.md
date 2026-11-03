@@ -1,6 +1,8 @@
-# Guía de implementación: Requerimiento 1 (Similitud textual)
+# Guía de implementación de los algoritmos
 
-Spec: [`docs/specs/001-similitud-textual/spec.md`](specs/001-similitud-textual/spec.md). Plan: [`plan.md`](specs/001-similitud-textual/plan.md). Trazabilidad: [`docs/traceability.md`](traceability.md).
+Cubre el Requerimiento 1, similitud textual (secciones 1 a 9), y el Requerimiento 3, clustering jerárquico (sección 10). Trazabilidad: [`docs/traceability.md`](traceability.md).
+
+Requerimiento 1. Spec: [`docs/specs/001-similitud-textual/spec.md`](specs/001-similitud-textual/spec.md). Plan: [`plan.md`](specs/001-similitud-textual/plan.md).
 
 Esta guía dice exactamente qué y dónde implementar. El andamiaje (ingesta de PDF, preprocesamiento, embeddings, API, interfaz y tests) ya está hecho. A los estudiantes les toca escribir a mano el cuerpo del método `compare` de 6 clases y declarar su complejidad (constitución P1, P3 y P8).
 
@@ -330,9 +332,9 @@ Cada stub deja `Complejidad: TODO estudiante` en el Javadoc de la clase y de `co
 | Comando | Qué ejecuta | Con los stubs sin implementar |
 |---|---|---|
 | `./gradlew test` | suite estándar, sin las etiquetas `student` ni `scaffold` | verde |
-| `./gradlew studentTest` | tests de estudiante de los 6 algoritmos y los 2 oráculos | todos fallan |
+| `./gradlew studentTest` | tests de estudiante de los 6 algoritmos de similitud, los 2 oráculos y los 4 de clustering (sección 10) | todos fallan |
 | `./gradlew studentTest --tests <Clase>Test` | tests de un algoritmo | fallan hasta implementarlo |
-| `./gradlew scaffoldTest` | `StubScaffoldTest`: los 6 stubs siguen sin implementar | verde |
+| `./gradlew scaffoldTest` | `StubScaffoldTest` y `ClusteringStubScaffoldTest`: los stubs siguen sin implementar | verde |
 
 `scaffoldTest` describe el andamiaje recién entregado: deja de pasar para cada algoritmo que se implementa, y es lo esperado. `studentTest` y `scaffoldTest` no forman parte de `check`, así que `./gradlew build` no los ejecuta. Los oráculos y los IT usan Testcontainers y requieren Docker.
 
@@ -356,4 +358,166 @@ Declaración según la constitución P4:
 - El andamiaje de este requerimiento se generó con apoyo de IA generativa (Claude, de Anthropic), dentro del flujo de especificación, plan y tareas de `docs/specs/001-similitud-textual/`. Eso incluye la ingesta de PDF, el preprocesamiento, la integración de embeddings, la persistencia, la API, la interfaz web, los contratos y stubs, los tests, el benchmark y esta guía. Las decisiones quedaron registradas y aprobadas en la spec y el plan.
 - Los cuerpos de los 6 algoritmos (`compare` de `Levenshtein`, `NeedlemanWunsch`, `Jaccard`, `TfIdfCosineSimilarity`, `CosineSimilarity` y `EuclideanDistance`) y su análisis de complejidad no los genera la IA: los escriben a mano los estudiantes.
 - Los valores esperados de los casos a mano se calcularon con las fórmulas de la sección 5 y pueden verificarse a mano. Los oráculos de Postgres y pgvector sirven de referencia independiente.
+- El andamiaje del Requerimiento 3, clustering jerárquico (sección 10), también se generó con apoyo de IA generativa (Claude, de Anthropic), dentro del flujo de `docs/specs/003-clustering-jerarquico/`: contratos, stubs, validación del dendrograma, trazas, API, interfaz (dendrogramas con D3 y visor de traza), tests y esta sección. Los cuerpos de `cluster` de `SingleLinkage`, `CompleteLinkage`, `AverageLinkage` y `Diana` y su complejidad los escriben a mano los estudiantes. Los valores esperados del caso a mano D₄ se calcularon con las fórmulas de la sección 10 y pueden verificarse a mano.
 - Si los estudiantes usan IA generativa como apoyo al implementar o analizar, deben declararlo en el documento técnico, indicando en qué y cómo. La IA no reemplaza el diseño algorítmico ni el análisis formal.
+
+## 10. Requerimiento 3: Clustering jerárquico
+
+Spec: [`docs/specs/003-clustering-jerarquico/spec.md`](specs/003-clustering-jerarquico/spec.md). Plan: [`plan.md`](specs/003-clustering-jerarquico/plan.md).
+
+A los estudiantes les toca escribir a mano el cuerpo del método `cluster` de 3 algoritmos aglomerativos (Single, Complete y Average Linkage) y, de forma opcional, del divisivo DIANA, y declarar su complejidad. El resto ya está hecho: la matriz de distancias, la validación del dendrograma, la API, la sección "Clustering jerárquico" de la página de similitud textual (4 dendrogramas en cuadrícula 2×2 y visor de traza) y los tests.
+
+### 10.1 Flujo de trabajo
+
+1. Abrir el stub en `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/`. Su Javadoc trae las secciones Qué calcula, Fórmula, Desempate, Traza, Rango, Caso a mano, Casos de borde y Complejidad.
+2. Reemplazar el `throw new UnsupportedOperationException("TODO estudiante: …")` por la implementación, solo con arreglos, `List`, `HashMap`, `HashSet` y ciclos (secciones 4 y 10.3).
+3. Devolver un `ClusteringResult(merges, trace)`: las N − 1 fusiones del dendrograma y el record de traza.
+4. Reemplazar `Complejidad: TODO estudiante` en el Javadoc de la clase y de `cluster` por la complejidad en tiempo y espacio en función de N, con su justificación.
+5. Ejecutar `./gradlew studentTest --tests <Clase>Test` hasta que pase; luego `./gradlew test`.
+6. Revisar el resultado en la interfaz: pestaña "Similitud textual", comparar artículos y bajar a "Clustering jerárquico".
+
+Mientras un método lance la excepción con el prefijo `TODO estudiante:`, la API devuelve ese algoritmo con estado PENDIENTE y la interfaz muestra "Pendiente de implementar: <archivo>#cluster". Si la fuente de similitud elegida (un stub del Requerimiento 1) tampoco está implementada, la sección lo avisa y no dibuja dendrogramas.
+
+| Algoritmo | Archivo | Método | Traza | Test |
+|---|---|---|---|---|
+| Single Linkage | `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/SingleLinkage.java` | `cluster(double[][] distances)` | `LinkageTrace` | `./gradlew studentTest --tests SingleLinkageTest` |
+| Complete Linkage | `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/CompleteLinkage.java` | `cluster(double[][] distances)` | `LinkageTrace` | `./gradlew studentTest --tests CompleteLinkageTest` |
+| Average Linkage (UPGMA) | `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/AverageLinkage.java` | `cluster(double[][] distances)` | `LinkageTrace` | `./gradlew studentTest --tests AverageLinkageTest` |
+| DIANA (opcional) | `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/Diana.java` | `cluster(double[][] distances)` | `DianaTrace` | `./gradlew studentTest --tests DianaTest` |
+
+Los records de traza están en `src/main/java/co/edu/uniquindio/bibliomtr/trace/clustering/`.
+
+**Por qué estos algoritmos.** Single, Complete y Average cubren las tres definiciones clásicas de distancia entre grupos (mínima, máxima y promedio) con la misma estructura: una matriz de distancias que se actualiza con la fórmula de Lance-Williams, O(N³) en tiempo con la búsqueda directa del mínimo y O(N²) en espacio. Single tiende a encadenar grupos, Complete forma grupos compactos y Average (UPGMA) queda entre ambos y es el más usado con distancias de texto. Ward se descartó porque supone distancias euclidianas al cuadrado, y d = 1 − s no lo es en general. DIANA es el contraste top-down: cada división cuesta O(|C|²) por iteración, y es opcional.
+
+### 10.2 Contexto común
+
+**Entrada.** `distances` es una matriz N×N, con N de 2 a 20, simétrica, de diagonal 0 y valores en [0,1]. La arma `ClusteringService` a partir de la matriz de similitud de la fuente elegida del Requerimiento 1 (SPECTER2 coseno por defecto), sin reimplementar el preprocesamiento ni la similitud: d(i, j) = 1 − s(i, j) para i ≠ j y d(i, i) = 0. La fila i es el artículo i de la solicitud. Cada algoritmo recibe su propia copia.
+
+**Salida: lista de fusiones estilo SciPy.** Las hojas son 0..N−1. La fusión k (0 ≤ k < N − 1) crea el grupo N + k. `Merge(left, right, height, size)` con `left < right`, `height` = distancia entre los dos grupos y `size` = artículos del grupo nuevo. La interfaz dibuja exactamente estas fusiones con D3, sin recalcular nada.
+
+**Validación.** `DendrogramValidator` revisa que haya N − 1 fusiones, que cada fusión use hojas o grupos ya creados, que ningún grupo se fusione dos veces, que `size` sea la suma de los hijos y que la altura esté en [0,1] (se recorta un margen de 1e-9). Si algo falla, la API responde HTTP 500 con "El algoritmo <slug> devolvió un dendrograma inválido: <razón>". No revisa que las fusiones sean las correctas: eso lo hacen los tests `student`.
+
+**API.** `POST /api/clustering` con `{"articleIds": [...], "source": "<slug>"}` devuelve las distancias, el tiempo de preparación y los 4 dendrogramas con su tiempo; `GET /api/clustering/trace?algorithm=<slug>&source=<slug>&articleIds=1,2,3` devuelve además la traza de uno.
+
+**Caso a mano D₄** (el de todos los tests y la guía):
+
+|   | 0 | 1 | 2 | 3 |
+|---|---|---|---|---|
+| 0 | 0 | 0.2 | 0.5 | 0.7 |
+| 1 | 0.2 | 0 | 0.3 | 0.6 |
+| 2 | 0.5 | 0.3 | 0 | 0.45 |
+| 3 | 0.7 | 0.6 | 0.45 | 0 |
+
+**Casos de borde de los tests:** 2 artículos a distancia 0.35 dan la única fusión (0, 1, 0.35, 2); los abstracts idénticos 0 y 2 (d = 0) se fusionan a altura 0; con 4 artículos y todas las distancias en 0.5 se aplica la regla de desempate; con 20 artículos aleatorios (`Random(42)`) hay 19 fusiones válidas, la última de tamaño 20, y dos ejecuciones dan lo mismo.
+
+### 10.3 Prohibiciones
+
+`ForbiddenClusteringUsageTest`, en `./gradlew test`, falla si el código de producción importa librerías de clustering (Smile, Weka, el clustering de Commons Math, `com.apporiented`, Spark MLlib, Tribuo o JSAT), si `build.gradle.kts` las declara o si `web/` depende de paquetes como `ml-hclust`. D3 solo dibuja. `ForbiddenSortUsageTest` sigue prohibiendo `TreeMap`, `TreeSet`, `PriorityQueue` y los ordenamientos de librería.
+
+### 10.4 Single Linkage — `SingleLinkage`
+
+- **Archivo:** `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/SingleLinkage.java`
+- **Método:** `cluster(double[][] distances)`, de `HierarchicalClustering<LinkageTrace>`.
+- **Qué calcula:** el dendrograma aglomerativo en el que la distancia entre dos grupos es la mínima entre sus artículos.
+
+**Fórmula.** En cada paso se fusionan los dos grupos activos más cercanos, i y j, en k = i ∪ j, y se recalcula su distancia a cada grupo h que queda (Lance-Williams):
+
+```
+d(k, h) = min( d(i, h), d(j, h) )
+```
+
+**Desempate.** Entre los pares (p, q), p < q, de distancia mínima gana el de menor p y, a igual p, el de menor q (orden lexicográfico de los ids de grupo). Se compara con `<` exacto, sin margen.
+
+**Traza esperada.** `LinkageTrace(steps)`, un `LinkageStep` por fusión: `clusters` (ids de los grupos activos antes de fusionar: los que quedan conservan su orden y el nuevo va al final), `members` (artículos de cada grupo, en orden creciente), `distances` (matriz entre esos grupos), `left`, `right`, `distance`, `newCluster`, `remaining` (`clusters` sin `left` ni `right`) y `updatedRow` (d(newCluster, h) para cada h de `remaining`).
+
+**Caso a mano** (D₄): fusiones (0, 1, 0.2, 2), (2, 4, 0.3, 3), (3, 5, 0.45, 4). Paso 1: `updatedRow` = [min(0.5, 0.3), min(0.7, 0.6)] = [0.3, 0.6] frente a `remaining` = [2, 3]. Paso 2: `clusters` = [2, 3, 4] y `updatedRow` = [0.45]. Con todas las distancias en 0.5: (0, 1), (2, 3), (4, 5).
+
+**Tests:** `./gradlew studentTest --tests SingleLinkageTest`
+
+**Vista:** `web/src/features/clustering/LinkageTraceView.tsx`, con la matriz entre grupos, el par elegido y la fila recalculada de cada fusión.
+
+### 10.5 Complete Linkage — `CompleteLinkage`
+
+- **Archivo:** `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/CompleteLinkage.java`
+- **Método:** `cluster(double[][] distances)`, de `HierarchicalClustering<LinkageTrace>`.
+- **Qué calcula:** el dendrograma aglomerativo en el que la distancia entre dos grupos es la máxima entre sus artículos.
+
+**Fórmula.**
+
+```
+d(k, h) = max( d(i, h), d(j, h) )
+```
+
+**Desempate.** El mismo de Single Linkage: par (p, q) lexicográficamente menor, con `<` exacto.
+
+**Traza esperada.** `LinkageTrace`, con los mismos campos de Single Linkage.
+
+**Caso a mano** (D₄): fusiones (0, 1, 0.2, 2), (2, 3, 0.45, 2), (4, 5, 0.7, 4). Paso 1: `updatedRow` = [max(0.5, 0.3), max(0.7, 0.6)] = [0.5, 0.7]. Con todas las distancias en 0.5: (0, 1), (2, 3), (4, 5).
+
+**Tests:** `./gradlew studentTest --tests CompleteLinkageTest`
+
+**Vista:** `web/src/features/clustering/LinkageTraceView.tsx`.
+
+### 10.6 Average Linkage (UPGMA) — `AverageLinkage`
+
+- **Archivo:** `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/AverageLinkage.java`
+- **Método:** `cluster(double[][] distances)`, de `HierarchicalClustering<LinkageTrace>`.
+- **Qué calcula:** el dendrograma aglomerativo en el que la distancia entre dos grupos es el promedio de las distancias entre todos sus pares de artículos.
+
+**Fórmula.** Con |i| y |j| el número de artículos de cada grupo:
+
+```
+d(k, h) = ( |i| · d(i, h) + |j| · d(j, h) ) / ( |i| + |j| )
+```
+
+**Desempate.** El mismo de Single Linkage: par (p, q) lexicográficamente menor, con `<` exacto.
+
+**Traza esperada.** `LinkageTrace`, con los mismos campos de Single Linkage.
+
+**Caso a mano** (D₄): fusiones (0, 1, 0.2, 2), (2, 4, 0.4, 3), (3, 5, 0.583333, 4). Paso 1: `updatedRow` = [(0.5 + 0.3)/2, (0.7 + 0.6)/2] = [0.4, 0.65]. Paso 2: d(5, 3) = (1 · 0.45 + 2 · 0.65)/3 = 1.75/3 = 0.583333. Con todas las distancias en 0.5: (0, 1), (2, 3), (4, 5).
+
+**Tests:** `./gradlew studentTest --tests AverageLinkageTest`
+
+**Vista:** `web/src/features/clustering/LinkageTraceView.tsx`.
+
+### 10.7 DIANA (divisivo, opcional) — `Diana`
+
+- **Archivo:** `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/Diana.java`
+- **Método:** `cluster(double[][] distances)`, de `HierarchicalClustering<DianaTrace>`.
+- **Qué calcula:** un dendrograma top-down. Empieza con un grupo con todos los artículos y divide en dos, siempre, el grupo de mayor diámetro, hasta que cada artículo queda solo. Puede implementarse recursivo o con una pila.
+
+**Fórmula.**
+
+```
+diam(C) = max { d(a, b) : a, b ∈ C }
+S₀      = { el i de C con mayor distancia media al resto de C },   R₀ = C \ S₀
+D(i)    = media de d(i, R \ {i}) − media de d(i, S),   i ∈ R
+mientras max D(i) > 0: mover a S el i de mayor D(i)
+```
+
+La división de C se registra a altura diam(C). Las fusiones se devuelven en el orden inverso de las divisiones (la última división es la fusión 0), con la misma convención de ids que los aglomerativos.
+
+**Desempate.** Se divide el grupo de mayor diámetro (empate: el grupo cuyo menor artículo es menor). S₀ y cada movimiento eligen, a igual valor, el artículo de menor índice. Un artículo se mueve solo si D(i) > 0 estricto.
+
+**Traza esperada.** `DianaTrace(steps)`, un `DianaStep` por división: `clusters` (grupos activos antes de dividir; el dividido se reemplaza en su posición por la parte con el menor artículo seguida de la otra), `diameters`, `splitIndex`, `diameter`, `iterations`, `splinter` y `remainder`. Cada `DianaIteration` trae `splinter`, `remainder`, `averageToRemainder`, `averageToSplinter`, `differences` (alineados con `remainder`) y `moved` (el artículo movido, o −1 al terminar). En la primera iteración `splinter` está vacío, `averageToSplinter` es 0 y `differences` = `averageToRemainder`.
+
+**Caso a mano** (D₄):
+1. División de {0,1,2,3} con diámetro 0.7: medias iniciales [0.466667, 0.366667, 0.416667, 0.583333], así que S = {3}. Luego D = [−0.35, −0.35, −0.05] y termina.
+2. División de {0,1,2} con diámetro 0.5: S = {2}; luego D = [−0.3, −0.1].
+3. División de {0,1} con diámetro 0.2: S = {0}.
+
+Fusiones: (0, 1, 0.2, 2), (2, 4, 0.5, 3), (3, 5, 0.7, 4). Con todas las distancias en 0.5: (2, 3), (1, 4), (0, 5).
+
+**Tests:** `./gradlew studentTest --tests DianaTest`
+
+**Vista:** `web/src/features/clustering/DianaTraceView.tsx`, con los grupos y diámetros, las iteraciones del grupo disidente y las dos partes de cada división.
+
+### 10.8 Comandos y tiempos
+
+| Comando | Qué ejecuta | Con los stubs sin implementar |
+|---|---|---|
+| `./gradlew studentTest --tests '*LinkageTest' --tests DianaTest` | los tests de estudiante de clustering | todos fallan |
+| `./gradlew scaffoldTest --tests ClusteringStubScaffoldTest` | los 4 stubs siguen sin implementar | verde |
+| `./gradlew test` | incluye `DendrogramValidatorTest`, `ClusteringStubDocumentationTest`, `ForbiddenClusteringUsageTest` y `ClusteringApiIT` | verde |
+
+Cada solicitud de clustering reporta `preparationMs` (preprocesamiento y matriz de similitud) y el `elapsedMs` de cada algoritmo, por separado. La complejidad declarada en el Javadoc se contrasta con esos tiempos en el documento técnico.

@@ -1,11 +1,11 @@
 # bibliomtr
 
-Ejercicio académico de Análisis de Algoritmos (Universidad del Quindío): comparación de algoritmos clásicos de similitud textual y embeddings sobre los abstracts de 20 artículos científicos.
+Ejercicio académico de Análisis de Algoritmos (Universidad del Quindío): comparación de algoritmos clásicos de similitud textual y embeddings, ranking de términos y clustering jerárquico sobre los abstracts de 20 artículos científicos.
 
 - Principios: [`docs/constitution.md`](docs/constitution.md)
 - Instrucciones para agentes y stack: [`AGENTS.md`](AGENTS.md)
 - Trazabilidad requerimiento → módulo → documento técnico: [`docs/traceability.md`](docs/traceability.md)
-- Guía de implementación de los algoritmos de similitud (Requerimiento 1): [`docs/guia-implementacion.md`](docs/guia-implementacion.md)
+- Guía de implementación de los algoritmos de similitud (Requerimiento 1) y de clustering jerárquico (Requerimiento 3): [`docs/guia-implementacion.md`](docs/guia-implementacion.md)
 
 ## Requisitos
 
@@ -33,13 +33,22 @@ cd web && npm run dev         # frontend en :5173
 
 ```bash
 ./gradlew test                # JUnit 5 + Testcontainers (requiere Docker)
-./gradlew studentTest         # tests de estudiante de los algoritmos de similitud (fallan hasta implementarlos)
+./gradlew studentTest         # tests de estudiante de similitud y de clustering (fallan hasta implementarlos)
 ./gradlew studentTest --tests LevenshteinTest   # tests de un solo algoritmo
+./gradlew studentTest --tests '*LinkageTest' --tests DianaTest   # tests de estudiante del clustering jerárquico
 ./gradlew scaffoldTest        # comprueba que los stubs del andamiaje siguen sin implementar
 ./gradlew jmhJar && java -jar build/libs/benchmarks.jar SimilarityBenchmark   # benchmarks JMH de similitud
 ```
 
 Qué implementar en cada algoritmo de similitud, con sus fórmulas, casos a mano, tests y benchmark: [`docs/guia-implementacion.md`](docs/guia-implementacion.md).
+
+## Clustering jerárquico (Requerimiento 3)
+
+Tras comparar artículos en la pestaña "Similitud textual", la sección "Clustering jerárquico" agrupa esos mismos artículos con Single, Complete y Average Linkage (UPGMA) y con DIANA (divisivo, opcional), sobre la distancia d = 1 − s de la fuente de similitud elegida (SPECTER2 coseno por defecto). Muestra los 4 dendrogramas en una cuadrícula 2×2, con el tiempo de preparación y el de cada algoritmo, y la traza paso a paso de cada uno.
+
+- API: `POST /api/clustering` con `{"articleIds": [..], "source": "specter2-cosine"}` y `GET /api/clustering/trace?algorithm=single-linkage&source=specter2-cosine&articleIds=1,2,3`.
+- Stubs a implementar: `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/clustering/` (`SingleLinkage`, `CompleteLinkage`, `AverageLinkage`, `Diana`). Mientras no estén implementados, aparecen como "Pendiente de implementar".
+- Fórmulas, desempate, trazas, caso a mano D₄ y tests: [`docs/guia-implementacion.md`](docs/guia-implementacion.md) § 10.
 
 ## Stack completo
 

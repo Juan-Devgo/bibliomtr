@@ -54,8 +54,8 @@
 - [x] T043 Verificar `npm test`, `npm run lint` y `npm run build` en `web/` (REQ-17)
 
 ## Phase 6: Guía, trazabilidad y README
-- [ ] T044 Agregar la sección "## 10. Requerimiento 3: Clustering jerárquico" con un apartado por stub, el título general y la declaración de IA en `docs/guia-implementacion.md` (REQ-20, AC-18)
-- [ ] T045 Agregar las filas del Requerimiento 3 con la sección `(pendiente)` en `docs/traceability.md` (REQ-21, AC-18)
-- [ ] T046 Crear `ClusteringGuideTest` en `src/test/java/co/edu/uniquindio/bibliomtr/docs/ClusteringGuideTest.java` (REQ-20, REQ-21, AC-18)
-- [ ] T047 Agregar la sección de clustering y los comandos de test en `README.md` (REQ-20)
-- [ ] T048 Verificar `./gradlew test`, `./gradlew scaffoldTest` y `npm test` en verde (REQ-9, AC-3)
+- [x] T044 Agregar la sección "## 10. Requerimiento 3: Clustering jerárquico" con un apartado por stub, el título general y la declaración de IA en `docs/guia-implementacion.md` (REQ-20, AC-18)
+- [x] T045 Agregar las filas del Requerimiento 3 con la sección `(pendiente)` en `docs/traceability.md` (REQ-21, AC-18)
+- [x] T046 Crear `ClusteringGuideTest` en `src/test/java/co/edu/uniquindio/bibliomtr/docs/ClusteringGuideTest.java` (REQ-20, REQ-21, AC-18)
+- [x] T047 Agregar la sección de clustering y los comandos de test en `README.md` (REQ-20)
+- [x] T048 Verificar `./gradlew test`, `./gradlew scaffoldTest` y `npm test` en verde (REQ-9, AC-3)
