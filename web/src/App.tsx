@@ -1,10 +1,14 @@
 import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
-import { useState, type ReactElement } from 'react'
+import { lazy, Suspense, useState, type ComponentType } from 'react'
 import HomePage from '@/pages/HomePage'
-import SimilarityPage from '@/pages/SimilarityPage'
-import TermRankingPage from '@/pages/TermRankingPage'
+
+// Las páginas de los requerimientos se cargan al abrir su pestaña: así KaTeX, D3 y Recharts no entran en el
+// bundle inicial.
+const SimilarityPage = lazy(() => import('@/pages/SimilarityPage'))
+const TermRankingPage = lazy(() => import('@/pages/TermRankingPage'))
 
 /** Pestañas de la aplicación; se agrega una por requerimiento. */
 const TABS = [
@@ -16,7 +20,7 @@ const TABS = [
 type TabId = (typeof TABS)[number]['id']
 
 /** Página de cada pestaña. */
-const PAGES: Record<TabId, () => ReactElement> = {
+const PAGES: Record<TabId, ComponentType> = {
   home: HomePage,
   similarity: SimilarityPage,
   'term-ranking': TermRankingPage,
@@ -40,7 +44,15 @@ function App() {
         </Tabs>
       </Box>
       <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
-        <Page />
+        <Suspense
+          fallback={
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+              <CircularProgress aria-label="Cargando página" />
+            </Box>
+          }
+        >
+          <Page />
+        </Suspense>
       </div>
     </>
   )
