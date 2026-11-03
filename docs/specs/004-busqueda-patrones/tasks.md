@@ -27,18 +27,18 @@
 - [x] T022 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `test: tests de estudiante y fragmento de la guía de búsqueda de patrones (fase 2 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
 
 ## Phase 3: API de búsqueda de patrones
-- [ ] T023 Crear `PendingStubs` en `src/main/java/co/edu/uniquindio/bibliomtr/api/PendingStubs.java` (REQ-28)
-- [ ] T024 Crear `StringMatchingAlgorithm` y `StringMatchingCatalog` en `src/main/java/co/edu/uniquindio/bibliomtr/api/stringmatching/` (REQ-15, REQ-22, REQ-28)
-- [ ] T025 Crear el bean `StringMatchingCatalog` con los 3 stubs en `src/main/java/co/edu/uniquindio/bibliomtr/config/StringMatchingConfig.java` (REQ-15)
-- [ ] T026 Crear `PatternSearchValidator` en `src/main/java/co/edu/uniquindio/bibliomtr/api/stringmatching/PatternSearchValidator.java` (REQ-15, REQ-17, REQ-22, AC-13, AC-19, AC-25)
-- [ ] T027 Crear `PatternSearchDtos` en `src/main/java/co/edu/uniquindio/bibliomtr/api/stringmatching/PatternSearchDtos.java` (REQ-15, REQ-16, REQ-22, REQ-28, REQ-29)
-- [ ] T028 Crear `PatternSearchService` (un preprocesamiento, una búsqueda por abstract, PENDIENTE con método, validación de posiciones, `allMatch`, tiempos y traza) en `src/main/java/co/edu/uniquindio/bibliomtr/api/stringmatching/PatternSearchService.java` (REQ-1, REQ-8, REQ-15, REQ-16, REQ-18, REQ-22, REQ-28, REQ-29, AC-27)
-- [ ] T029 Crear `PatternSearchController` con `GET /api/pattern-search` y `GET /api/pattern-search/trace` en `src/main/java/co/edu/uniquindio/bibliomtr/api/stringmatching/PatternSearchController.java` (REQ-15, REQ-22)
-- [ ] T030 Manejar `InvalidMatchPositionsException` como 500 con mensaje en español en `src/main/java/co/edu/uniquindio/bibliomtr/api/ApiExceptionHandler.java` (REQ-8, AC-3)
-- [ ] T031 Crear `FakeStringMatchingCatalog` (implementado, pendiente en `preprocess`, pendiente en `search`, inválido; espía de llamadas) en `src/test/java/co/edu/uniquindio/bibliomtr/api/stringmatching/FakeStringMatchingCatalog.java` (REQ-1, REQ-28, REQ-29)
-- [ ] T032 Crear `PatternSearchApiIT` en `src/test/java/co/edu/uniquindio/bibliomtr/api/stringmatching/PatternSearchApiIT.java` (REQ-1, REQ-8, REQ-15, REQ-16, REQ-17, REQ-18, REQ-22, REQ-28, REQ-29, AC-3, AC-12, AC-13, AC-14, AC-19, AC-20, AC-21, AC-25, AC-26, AC-27)
-- [ ] T033 Verificar `./gradlew test` en verde, incluidos `ForbiddenStringMatchingUsageTest`, `ForbiddenSortUsageTest`, `ComparisonApiIT` y `ClusteringApiIT` (REQ-14, AC-2, AC-4)
-- [ ] T034 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `feat: API de búsqueda de patrones (fase 3 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+- [x] T023 Crear `PendingStubs` en `src/main/java/co/edu/uniquindio/bibliomtr/api/PendingStubs.java` (REQ-28)
+- [x] T024 Crear `StringMatchingAlgorithm` y `StringMatchingCatalog` en `src/main/java/co/edu/uniquindio/bibliomtr/api/stringmatching/` (REQ-15, REQ-22, REQ-28)
+- [x] T025 Crear el bean `StringMatchingCatalog` con los 3 stubs en `src/main/java/co/edu/uniquindio/bibliomtr/config/StringMatchingConfig.java` (REQ-15)
+- [x] T026 Crear `PatternSearchValidator` en `src/main/java/co/edu/uniquindio/bibliomtr/api/stringmatching/PatternSearchValidator.java` (REQ-15, REQ-17, REQ-22, AC-13, AC-19, AC-25)
+- [x] T027 Crear `PatternSearchDtos` en `src/main/java/co/edu/uniquindio/bibliomtr/api/stringmatching/PatternSearchDtos.java` (REQ-15, REQ-16, REQ-22, REQ-28, REQ-29)
+- [x] T028 Crear `PatternSearchService` (un preprocesamiento, una búsqueda por abstract, PENDIENTE con método, validación de posiciones, `allMatch`, tiempos y traza) en `src/main/java/co/edu/uniquindio/bibliomtr/api/stringmatching/PatternSearchService.java` (REQ-1, REQ-8, REQ-15, REQ-16, REQ-18, REQ-22, REQ-28, REQ-29, AC-27)
+- [x] T029 Crear `PatternSearchController` con `GET /api/pattern-search` y `GET /api/pattern-search/trace` en `src/main/java/co/edu/uniquindio/bibliomtr/api/stringmatching/PatternSearchController.java` (REQ-15, REQ-22)
+- [x] T030 Manejar `InvalidMatchPositionsException` como 500 con mensaje en español en `src/main/java/co/edu/uniquindio/bibliomtr/api/ApiExceptionHandler.java` (REQ-8, AC-3)
+- [x] T031 Crear `FakeStringMatchingCatalog` (implementado, pendiente en `preprocess`, pendiente en `search`, inválido; espía de llamadas) en `src/test/java/co/edu/uniquindio/bibliomtr/api/stringmatching/FakeStringMatchingCatalog.java` (REQ-1, REQ-28, REQ-29)
+- [x] T032 Crear `PatternSearchApiIT` en `src/test/java/co/edu/uniquindio/bibliomtr/api/stringmatching/PatternSearchApiIT.java` (REQ-1, REQ-8, REQ-15, REQ-16, REQ-17, REQ-18, REQ-22, REQ-28, REQ-29, AC-3, AC-12, AC-13, AC-14, AC-19, AC-20, AC-21, AC-25, AC-26, AC-27)
+- [x] T033 Verificar `./gradlew test` en verde, incluidos `ForbiddenStringMatchingUsageTest`, `ForbiddenSortUsageTest`, `ComparisonApiIT` y `ClusteringApiIT` (REQ-14, AC-2, AC-4)
+- [x] T034 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `feat: API de búsqueda de patrones (fase 3 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
 
 ## Phase 4: Pestaña "Búsqueda Patrones"
 - [ ] T035 Crear los tipos en `web/src/types/patternSearch.ts` (REQ-15, REQ-22)
