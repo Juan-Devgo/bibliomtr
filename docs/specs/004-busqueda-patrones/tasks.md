@@ -76,9 +76,9 @@
 - [x] T063 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `feat: benchmarks JMH de la búsqueda de patrones (fase 6 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
 
 ## Phase 7: Guía, trazabilidad y README
-- [ ] T064 Agregar la sección "## 11. Requerimiento 4: Coincidencia exacta de cadenas" con un apartado por stub, el ejemplo del fragmento real, el comando JMH y la declaración de IA, sin tocar § 10, en `docs/guia-implementacion.md` (REQ-31, REQ-32, AC-22, AC-23)
-- [ ] T065 Agregar las filas del Requerimiento 4 con la sección `(pendiente)`, sin tocar las del Requerimiento 3, en `docs/traceability.md` (REQ-33, AC-23)
-- [ ] T066 Crear `PatternSearchGuideTest` en `src/test/java/co/edu/uniquindio/bibliomtr/docs/PatternSearchGuideTest.java` (REQ-31, REQ-32, REQ-33, AC-22, AC-23)
-- [ ] T067 Agregar la sección de búsqueda de patrones, los comandos de test y el de JMH en `README.md` (REQ-30, REQ-31)
-- [ ] T068 Verificar `./gradlew test`, `./gradlew scaffoldTest` y `npm test` en verde, incluidos `ImplementationGuideTest` y `ClusteringGuideTest` (REQ-13, REQ-33, AC-4)
-- [ ] T069 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `docs: guía, trazabilidad y README de la búsqueda de patrones (fase 7 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+- [x] T064 Agregar la sección "## 11. Requerimiento 4: Coincidencia exacta de cadenas" con un apartado por stub, el ejemplo del fragmento real, el comando JMH y la declaración de IA, sin tocar § 10, en `docs/guia-implementacion.md` (REQ-31, REQ-32, AC-22, AC-23)
+- [x] T065 Agregar las filas del Requerimiento 4 con la sección `(pendiente)`, sin tocar las del Requerimiento 3, en `docs/traceability.md` (REQ-33, AC-23)
+- [x] T066 Crear `PatternSearchGuideTest` en `src/test/java/co/edu/uniquindio/bibliomtr/docs/PatternSearchGuideTest.java` (REQ-31, REQ-32, REQ-33, AC-22, AC-23)
+- [x] T067 Agregar la sección de búsqueda de patrones, los comandos de test y el de JMH en `README.md` (REQ-30, REQ-31)
+- [x] T068 Verificar `./gradlew test`, `./gradlew scaffoldTest` y `npm test` en verde, incluidos `ImplementationGuideTest` y `ClusteringGuideTest` (REQ-13, REQ-33, AC-4)
+- [x] T069 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `docs: guía, trazabilidad y README de la búsqueda de patrones (fase 7 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
