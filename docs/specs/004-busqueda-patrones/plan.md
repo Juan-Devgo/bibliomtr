@@ -6,7 +6,7 @@
 - Constitution version: 1.2.0
 
 ## 2. Constitution check
-- P1: los 3 stubs de `algorithms/stringmatching` (`KnuthMorrisPratt`, `BoyerMoore`, `RabinKarp`) solo lanzan `UnsupportedOperationException("TODO estudiante: …")` en `preprocess` y en `search`; las guardas (patrón vacío, texto vacío o más corto) las escribe el estudiante. `ForbiddenStringMatchingUsageTest` prohíbe en `algorithms/stringmatching`, `trace/stringmatching` y `api/stringmatching` los `.<nombre>(` de REQ-14, `java.util.regex`, `Pattern` y `Matcher` como identificadores, y en `web/src/features/pattern-search` (más los componentes que importa) los nombres de REQ-14. El código nuevo tampoco usa `TreeMap`, `TreeSet`, `PriorityQueue` ni `.sort(` (`ForbiddenSortUsageTest`).
+- P1: los 3 stubs de `algorithms/stringmatching` (`KnuthMorrisPratt`, `BoyerMoore`, `RabinKarp`) solo lanzan `UnsupportedOperationException("TODO estudiante: …")` en `preprocess` y en `search`; las guardas (patrón vacío, texto vacío o más corto) las escribe el estudiante. `ForbiddenStringMatchingUsageTest` exige que existan y prohíbe en `algorithms/stringmatching`, `trace/stringmatching` y `api/stringmatching` (incluido `PendingStubs`) los `.<nombre>(` de REQ-14, `java.util.regex`, `Pattern` y `Matcher` como identificadores, y en los `.ts`/`.tsx` de producción de `web/src/features/pattern-search` (sin `*.test.*` ni `*.spec.*`, más los componentes que importa) los nombres de REQ-14. El código nuevo tampoco usa `TreeMap`, `TreeSet`, `PriorityQueue` ni `.sort(` (`ForbiddenSortUsageTest`).
 - P2: Recharts solo grafica desplazamientos, saltos y hashes de la traza; KaTeX solo dibuja fórmulas; JMH solo mide. `highlightSegments.ts` y `traceSteps.ts` solo reorganizan posiciones y pasos que devuelve la API.
 - P4: la sección 11 de la guía declara que el andamiaje se generó con IA generativa como apoyo.
 - P5: el texto buscado es `Article.getAbstractText()` de los artículos con `abstract_detected = true`; nunca el título ni el PDF.
@@ -48,7 +48,7 @@ Backend, producción (`src/main/java/co/edu/uniquindio/bibliomtr/`):
 - create: `algorithms/stringmatching/MatchPositionsValidator.java` - validación de posiciones sin buscar el patrón.
 - create: `algorithms/stringmatching/InvalidMatchPositionsException.java` - posiciones inválidas (500).
 - create: `trace/stringmatching/package-info.java`, `KmpPreprocessing.java`, `KmpTrace.java`, `BoyerMoorePreprocessing.java`, `BoyerMooreTrace.java`, `RabinKarpPreprocessing.java`, `RabinKarpTrace.java` - contratos de preprocesamiento y traza.
-- create: `api/PendingStubs.java` - detección del prefijo "TODO estudiante:" fuera del paquete escaneado.
+- create: `api/stringmatching/PendingStubs.java` - detección del prefijo "TODO estudiante:" carácter a carácter, dentro del paquete escaneado.
 - create: `api/stringmatching/StringMatchingAlgorithm.java` - enum con slug, etiqueta, archivo del stub y `pendingLocation(method)`.
 - create: `api/stringmatching/StringMatchingCatalog.java` - record con las 3 estrategias.
 - create: `api/stringmatching/PatternSearchValidator.java` - reglas de patrón y q (primalidad por división de prueba).
@@ -67,6 +67,8 @@ Backend, tests (`src/test/java/co/edu/uniquindio/bibliomtr/`):
 - create: `oracle/GuideFragmentCorpusTest.java` - suite estándar; el fragmento sale del abstract real (se omite sin el PDF).
 - create: `api/stringmatching/FakeStringMatchingCatalog.java` - algoritmos falsos configurables y espía de llamadas.
 - create: `api/stringmatching/PatternSearchApiIT.java` - `@SpringBootTest` con Postgres y el catálogo falso.
+- create: `api/stringmatching/PendingStubsTest.java` - prefijo exacto, sin `startsWith`.
+- create: `api/stringmatching/PatternSearchDtosTest.java` - `lastOccurrence` de Boyer-Moore como lista ordenada en el JSON.
 - create: `docs/PatternSearchGuideTest.java` - guía § 11 y trazabilidad del Requerimiento 4.
 
 Benchmarks (`src/jmh/java/co/edu/uniquindio/bibliomtr/evaluation/`):
@@ -180,7 +182,8 @@ record PatternTraceResponse(String algorithm, String label, long articleId, Stri
 - Algoritmo PENDIENTE en la búsqueda: `status` "PENDIENTE", `pendingLocation`, tiempos y `totalOccurrences` null, `articles` = []. En la traza: 200 con `status` "PENDIENTE", `pendingLocation`, y `positions`, `collisions`, `preprocessing`, `trace` null.
 - CALCULADO: `collisions` por artículo solo en `rabin-karp` (null en los demás); `totalOccurrences` = suma de `count`; tiempos en ms con `Stopwatch`.
 - Corpus sin abstracts: `articleCount` 0, `articles` [] y cada algoritmo con `articles` []; `allMatch` sigue la regla de §3.
-- `PendingStubs`: `public static final String PREFIX = "TODO estudiante:"`; `public static boolean isPending(UnsupportedOperationException e)`.
+- `PendingStubs` (package-private en `api/stringmatching`): `static final String PREFIX = "TODO estudiante:"`; `static boolean isPending(UnsupportedOperationException e)` compara el prefijo carácter a carácter (sin `.startsWith(`).
+- `preprocessing` de la traza: el record del algoritmo, salvo Boyer-Moore, que se expone como `BoyerMoorePreprocessingView(pattern, List<LastOccurrenceEntry(char character, int index)> lastOccurrence, borderPositions, goodSuffixShift, patternBorder, matchShift)`: la tabla del carácter malo viaja como lista en orden de primera aparición, porque un objeto JSON reordena las claves numéricas en JavaScript. El record de `trace/stringmatching` conserva el `Map` que usa el estudiante.
 - `ApiExceptionHandler`: `InvalidMatchPositionsException` → 500 con `title` "Error interno" y `detail` = mensaje.
 
 JMH (comando único, documentado en la guía):
@@ -204,6 +207,9 @@ Frontend:
 - `KmpTraceView` (tabla π y pasos de construcción), `BoyerMooreTraceView` (tablas del carácter malo, del sufijo bueno y salto tras ocurrencia), `RabinKarpTraceView` (d, q, h, hash del patrón, hash inicial y lista de colisiones), cada una con `StepNavigator`, `AlignedWindow`, fórmulas de `patternFormulas.ts` en `TraceStep`/`BlockMath` y `TraceChart`.
 - `TraceChart` (Recharts): KMP x = número de comparación, y = s; Boyer-Moore x = alineación, y = salto aplicado; Rabin-Karp x = s, y = hash de la ventana, `ReferenceLine` en hash(P) y puntos de colisión marcados.
 - `PatternTraceView`: con PENDIENTE muestra "Pendiente de implementar: <pendingLocation>".
+
+## 7. Test-first
+- No aplica: `AGENTS.md` no define test-first. Los tests por AC están en la tabla de § 8.
 
 ## 8. Traceability
 | Requirement | Component / file | Verified by (AC) |
@@ -231,11 +237,11 @@ Frontend:
 | REQ-21 | `highlightSegments.ts`, `traceSteps.ts`; `ForbiddenStringMatchingUsageTest`, `PatternSearchView.test.tsx` | AC-2, AC-15 |
 | REQ-22 | `PatternSearchService.trace`, `PatternSearchController`; `PatternSearchApiIT` | AC-19, AC-26 |
 | REQ-23 | `KmpPreprocessing`, `KmpTrace`; `KnuthMorrisPrattTest`, `PatternTraceView.test.tsx` | AC-5, AC-16 |
-| REQ-24 | `BoyerMoorePreprocessing`, `BoyerMooreTrace`; `BoyerMooreTest`, `PatternTraceView.test.tsx` | AC-17, AC-24 |
+| REQ-24 | `BoyerMoorePreprocessing`, `BoyerMooreTrace`, `PatternSearchDtos.BoyerMoorePreprocessingView`; `BoyerMooreTest`, `PatternSearchDtosTest`, `PatternTraceView.test.tsx` | AC-17, AC-24 |
 | REQ-25 | `RabinKarpPreprocessing`, `RabinKarpTrace`; `RabinKarpTest`, `PatternTraceView.test.tsx` | AC-9, AC-18 |
 | REQ-26 | `PatternTraceView`, `StepNavigator`, `AlignedWindow`, vistas por algoritmo, `patternFormulas.ts`, `traceSteps.ts`; `traceSteps.test.ts`, `PatternTraceView.test.tsx` | AC-16, AC-17, AC-18 |
 | REQ-27 | `TraceChart`; `PatternTraceView.test.tsx` | AC-16, AC-17, AC-18 |
-| REQ-28 | `PendingStubs`, `StringMatchingAlgorithm.pendingLocation`, `PatternSearchResults`, `PatternTraceView`; `PatternSearchApiIT`, `PatternSearchView.test.tsx`, `PatternTraceView.test.tsx` | AC-20, AC-26 |
+| REQ-28 | `PendingStubs`, `StringMatchingAlgorithm.pendingLocation`, `PatternSearchResults`, `PatternTraceView`; `PendingStubsTest`, `PatternSearchApiIT`, `PatternSearchView.test.tsx`, `PatternTraceView.test.tsx` | AC-20, AC-26 |
 | REQ-29 | `PatternSearchService` con `Stopwatch` y `MatchOptions(q, false)`; `PatternSearchApiIT`, `PatternSearchView.test.tsx` | AC-21, AC-27 |
 | REQ-30 | `StringMatchingBenchmark`, `RabinKarpBenchmark` | AC-22 |
 | REQ-31 | `docs/guia-implementacion.md` § 11; `PatternSearchGuideTest` | AC-22, AC-23 |
@@ -281,7 +287,8 @@ Comandos: `./gradlew test`, `./gradlew studentTest`, `./gradlew scaffoldTest`, `
 - Los records de preprocesamiento viven en `trace/stringmatching`: son a la vez la entrada de `search` y la traza del preprocesamiento (P7), sin duplicar tipos.
 - `GET` con parámetros y `q` como texto validado a mano (decisión del usuario): `q=abc` da el mensaje propio de §6 y no el genérico de enteros.
 - El escaneo por nombre en TypeScript usa identificador completo y excluye comentarios y cadenas (decisión del usuario): `searchMs`, `allMatch` o `mismatchIndex` no fallan; los archivos `*.test.*` no son producción y no se escanean.
-- `PendingStubs` en `api/` (decisión del usuario): `api/stringmatching` no puede usar `.startsWith(`; las specs 001 y 003 no cambian.
+- `PendingStubs` en `api/stringmatching` con comparación carácter a carácter: así todo el código de la API del requerimiento queda bajo el escaneo de REQ-14. Se rechazó dejarlo en `api/` con `.startsWith(` porque quedaba fuera del escaneo. Las specs 001 y 003 no cambian.
+- `lastOccurrence` como lista en la API y como `Map` en el record del estudiante: el estudiante consulta last(c) en O(1) y el JSON conserva el orden. Se rechazó anotar el record de `trace` con Jackson para no acoplar ese paquete a la serialización.
 - JMH en dos clases (decisión del usuario): `q` solo es parámetro de Rabin-Karp, así KMP y Boyer-Moore no repiten mediciones con un q que no usan.
 - `allMatch` con 2 o más CALCULADO y corpus vacío es `true` (no hay artículo en desacuerdo).
 - La respuesta de búsqueda incluye los abstracts (20 × ~2 000 `char`): la interfaz resalta sin otra petición.

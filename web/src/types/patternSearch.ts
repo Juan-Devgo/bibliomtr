@@ -111,11 +111,21 @@ export interface KmpTrace {
   occurrences: number[]
 }
 
-/** Preprocesamiento de Boyer-Moore (`BoyerMoorePreprocessing`, REQ-24). */
+/** Entrada de la tabla del carácter malo (`LastOccurrenceEntry`, REQ-24). */
+export interface LastOccurrenceEntry {
+  character: string
+  /** Última posición de `character` en el patrón. */
+  index: number
+}
+
+/** Preprocesamiento de Boyer-Moore (`BoyerMoorePreprocessingView`, REQ-24). */
 export interface BoyerMoorePreprocessing {
   pattern: string
-  /** Última posición de cada carácter del patrón, en orden de primera aparición; un ausente vale −1. */
-  lastOccurrence: Record<string, number>
+  /**
+   * Última posición de cada carácter del patrón, en orden de primera aparición; un ausente vale −1. Es una lista y
+   * no un objeto porque un objeto JSON reordena las claves numéricas ("1", "2", …).
+   */
+  lastOccurrence: LastOccurrenceEntry[]
   /** Arreglo f de m + 1 posiciones del preprocesamiento de bordes. */
   borderPositions: number[]
   /** Salto por desajuste en la posición j (regla fuerte del sufijo bueno). */

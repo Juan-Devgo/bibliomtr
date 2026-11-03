@@ -82,3 +82,10 @@
 - [x] T067 Agregar la sección de búsqueda de patrones, los comandos de test y el de JMH en `README.md` (REQ-30, REQ-31)
 - [x] T068 Verificar `./gradlew test`, `./gradlew scaffoldTest` y `npm test` en verde, incluidos `ImplementationGuideTest` y `ClusteringGuideTest` (REQ-13, REQ-33, AC-4)
 - [x] T069 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `docs: guía, trazabilidad y README de la búsqueda de patrones (fase 7 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+
+## Phase 8: Correcciones de la validación
+- [x] T070 Mover `PendingStubs` a `src/main/java/co/edu/uniquindio/bibliomtr/api/stringmatching/PendingStubs.java` (package-private, prefijo comparado carácter a carácter) y crear `PendingStubsTest` en `src/test/java/co/edu/uniquindio/bibliomtr/api/stringmatching/PendingStubsTest.java` (REQ-14, REQ-28, AC-2)
+- [x] T071 Exigir en `ForbiddenStringMatchingUsageTest` que exista `api/stringmatching` en vez de omitirlo (REQ-14, AC-2)
+- [x] T072 Exponer el preprocesamiento de Boyer-Moore como `BoyerMoorePreprocessingView` con `lastOccurrence` en lista en `PatternSearchDtos`/`PatternSearchService`, con `PatternSearchDtosTest`, y adaptar `types/patternSearch.ts`, `BoyerMooreTraceView.tsx` y `test/patternSearchFixtures.ts` (REQ-24, AC-17, AC-24)
+- [x] T073 Verificar `./gradlew test`, `./gradlew scaffoldTest`, `npm test`, `npm run lint` y `npm run build` en verde (REQ-13, AC-4)
+- [x] T074 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `fix: correcciones de la validación de la búsqueda de patrones (fase 8 de la spec 004)`, terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`

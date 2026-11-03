@@ -3,32 +3,13 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 import TraceStep from '@/components/TraceStep'
-import type { BoyerMooreAlignment, BoyerMoorePreprocessing, BoyerMooreTraceResponse } from '@/types/patternSearch'
+import type { BoyerMooreAlignment, BoyerMooreTraceResponse } from '@/types/patternSearch'
 import AlignedWindow from './AlignedWindow'
 import IndexedTable from './IndexedTable'
 import { BM_BAD_CHARACTER_FORMULA, BM_GOOD_SUFFIX_FORMULA, BM_SHIFT_FORMULA } from './patternFormulas'
 import StepNavigator from './StepNavigator'
 import TraceChart from './TraceChart'
 import { toFrames, visibleChar } from './traceSteps'
-
-/**
- * Claves de la tabla del carácter malo en orden de primera aparición en el patrón, como las guarda el backend
- * (`LinkedHashMap`). Se recorre el patrón porque un objeto JSON reordena las claves numéricas ("1", "2", …).
- *
- * Complejidad: O(m) en tiempo y O(σ) en espacio, con σ = caracteres distintos del patrón.
- */
-function badCharacterKeys(preprocessing: BoyerMoorePreprocessing): string[] {
-  const keys: string[] = []
-  const seen = new Set<string>()
-  for (let k = 0; k < preprocessing.pattern.length; k++) {
-    const character = preprocessing.pattern[k]
-    if (!seen.has(character) && preprocessing.lastOccurrence[character] !== undefined) {
-      seen.add(character)
-      keys.push(character)
-    }
-  }
-  return keys
-}
 
 /** Detalle de la alineación actual: comparaciones de derecha a izquierda y salto de cada regla (REQ-24). */
 function AlignmentDetail({ alignment }: { alignment: BoyerMooreAlignment }) {
@@ -78,7 +59,8 @@ function BoyerMooreTraceView({ response }: { response: BoyerMooreTraceResponse }
   }
   const frames = toFrames(response)
   const current = Math.min(index, frames.length - 1)
-  const keys = badCharacterKeys(preprocessing)
+  // La API envía la tabla del carácter malo como lista, ya en orden de primera aparición en el patrón.
+  const lastOccurrence = preprocessing.lastOccurrence
   const m = preprocessing.pattern.length
   const positions = preprocessing.goodSuffixShift.map((_, j) => j)
 
@@ -88,8 +70,8 @@ function BoyerMooreTraceView({ response }: { response: BoyerMooreTraceResponse }
         <IndexedTable
           label="Tabla del carácter malo"
           indexHeader="c"
-          columns={keys.map((key) => visibleChar(key))}
-          rows={[{ header: 'last(c)', cells: keys.map((key) => preprocessing.lastOccurrence[key]) }]}
+          columns={lastOccurrence.map((entry) => visibleChar(entry.character))}
+          rows={[{ header: 'last(c)', cells: lastOccurrence.map((entry) => entry.index) }]}
         />
         <Typography variant="body2" color="text.secondary">
           Un carácter que no está en el patrón vale −1.

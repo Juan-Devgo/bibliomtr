@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
  * a funciones nativas de cadenas ni a expresiones regulares (spec 004, REQ-7, REQ-14 y AC-2; constitución P1).
  *
  * <p><b>Alcance en Java.</b> Los {@code *.java} de {@code algorithms/stringmatching}, {@code trace/stringmatching}
- * y {@code api/stringmatching} (este último se escanea en cuanto existe). En cada archivo:
+ * y {@code api/stringmatching} (incluido {@code PendingStubs}); los tres paquetes deben existir. En cada archivo:
  * <ul>
  *   <li>Sobre el código sin comentarios ni contenido de cadenas o caracteres: ninguna llamada
  *       {@code .<nombre>(} con {@code indexOf}, {@code lastIndexOf}, {@code contains}, {@code matches},
@@ -89,12 +89,9 @@ class ForbiddenStringMatchingUsageTest {
 	void javaHasNoForbiddenStringMatching() {
 		assertThat(ALGORITHMS).as("paquete de algoritmos").isDirectory();
 		assertThat(TRACES).as("paquete de trazas").isDirectory();
-		List<Path> roots = new ArrayList<>(List.of(ALGORITHMS, TRACES));
-		if (Files.isDirectory(API)) {
-			roots.add(API);
-		}
+		assertThat(API).as("paquete de la API").isDirectory();
 		List<String> violations = new ArrayList<>();
-		for (Path root : roots) {
+		for (Path root : List.of(ALGORITHMS, TRACES, API)) {
 			for (Path file : sourceFiles(root, ".java")) {
 				violations.addAll(javaViolations(file.toString(), read(file)));
 			}

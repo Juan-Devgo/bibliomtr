@@ -10,7 +10,6 @@ import co.edu.uniquindio.bibliomtr.algorithms.stringmatching.MatchOptions;
 import co.edu.uniquindio.bibliomtr.algorithms.stringmatching.MatchPositionsValidator;
 import co.edu.uniquindio.bibliomtr.algorithms.stringmatching.MatchResult;
 import co.edu.uniquindio.bibliomtr.algorithms.stringmatching.StringMatcher;
-import co.edu.uniquindio.bibliomtr.api.PendingStubs;
 import co.edu.uniquindio.bibliomtr.api.similarity.AlgorithmStatus;
 import co.edu.uniquindio.bibliomtr.api.stringmatching.PatternSearchDtos.AlgorithmOccurrences;
 import co.edu.uniquindio.bibliomtr.api.stringmatching.PatternSearchDtos.ArticleOccurrences;
@@ -200,8 +199,8 @@ public class PatternSearchService {
 		List<Integer> positions = validPositions(algorithm, article.getId(), text, pattern, result);
 		List<Integer> collisions = algorithm == StringMatchingAlgorithm.RABIN_KARP ? result.collisions() : null;
 		return new PatternTraceResponse(algorithm.slug(), algorithm.label(), article.getId(), article.getTitle(),
-				text, pattern, q, AlgorithmStatus.CALCULADO.name(), null, positions, collisions, tables,
-				result.trace());
+				text, pattern, q, AlgorithmStatus.CALCULADO.name(), null, positions, collisions,
+				PatternSearchDtos.preprocessingJson(tables), result.trace());
 	}
 
 	/**

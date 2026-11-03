@@ -221,7 +221,10 @@ export const BOYER_MOORE_TRACE_ABAB: BoyerMooreTraceResponse = {
   collisions: null,
   preprocessing: {
     pattern: PATTERN,
-    lastOccurrence: { a: 2, b: 3 },
+    lastOccurrence: [
+      { character: 'a', index: 2 },
+      { character: 'b', index: 3 },
+    ],
     borderPositions: [2, 3, 4, 4, 5],
     goodSuffixShift: [2, 2, 4, 1],
     patternBorder: 2,
