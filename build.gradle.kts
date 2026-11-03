@@ -80,10 +80,10 @@ tasks.withType<Test> {
 	).withPropertyName("scannedSources").withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
-// Spec 001, REQ-7 y spec 003, REQ-9: los tests de los stubs se separan por etiqueta para que
-// `./gradlew test` (y por tanto `check` y `build`) quede en verde con los stubs sin implementar.
-// - `student`: casos a mano, bordes y oráculos de los 6 algoritmos de similitud y de los 4 de
-//   clustering; fallan hasta implementarlos.
+// Spec 001, REQ-7, spec 003, REQ-9 y spec 004, REQ-13: los tests de los stubs se separan por etiqueta
+// para que `./gradlew test` (y por tanto `check` y `build`) quede en verde con los stubs sin implementar.
+// - `student`: casos a mano, bordes y oráculos de los 6 algoritmos de similitud, de los 4 de
+//   clustering y de los 3 de búsqueda de patrones; fallan hasta implementarlos.
 // - `scaffold`: comprueba que los stubs del andamiaje siguen sin implementar.
 tasks.test {
 	useJUnitPlatform {
@@ -94,7 +94,7 @@ tasks.test {
 // Tests de los estudiantes: `./gradlew studentTest` (opcional `--tests <Clase>Test`).
 // No depende de `check`, así que `build` no los ejecuta.
 tasks.register<Test>("studentTest") {
-	description = "Ejecuta los tests de estudiante (etiqueta student) de los algoritmos de similitud y de clustering."
+	description = "Ejecuta los tests de estudiante (etiqueta student) de los algoritmos de similitud, de clustering y de búsqueda de patrones."
 	group = "verification"
 	testClassesDirs = sourceSets.test.get().output.classesDirs
 	classpath = sourceSets.test.get().runtimeClasspath
@@ -105,7 +105,7 @@ tasks.register<Test>("studentTest") {
 
 // Tests del andamiaje: `./gradlew scaffoldTest`. Tampoco depende de `check`.
 tasks.register<Test>("scaffoldTest") {
-	description = "Ejecuta los tests del andamiaje (etiqueta scaffold) de los stubs de similitud y de clustering."
+	description = "Ejecuta los tests del andamiaje (etiqueta scaffold) de los stubs de similitud, de clustering y de búsqueda de patrones."
 	group = "verification"
 	testClassesDirs = sourceSets.test.get().output.classesDirs
 	classpath = sourceSets.test.get().runtimeClasspath
