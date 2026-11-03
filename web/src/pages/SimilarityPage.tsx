@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography'
 import { useRef, useState } from 'react'
 import { useComparison } from '@/api/useComparison'
 import ArticleSelector from '@/features/article-selection/ArticleSelector'
+import ClusteringSection from '@/features/clustering/ClusteringSection'
 import SimilarityResults from '@/features/similarity-matrix/SimilarityResults'
 import SimilarityTraceView, { type TraceSelection } from '@/features/similarity-trace/SimilarityTraceView'
 import type { SimilarityAlgorithmSlug } from '@/types/similarity'
@@ -14,7 +15,8 @@ const NO_SELECTION: TraceSelection = { algorithm: null, a: null, b: null }
 /**
  * Página del Requerimiento 1: similitud textual con algoritmos clásicos y embeddings (spec 001, REQ-17).
  *
- * Reúne el selector de artículos, las 8 matrices de similitud con sus tiempos y el visor de traza. Un clic en
+ * Reúne el selector de artículos, las 8 matrices de similitud con sus tiempos, el visor de traza y, tras él, la
+ * sección de clustering jerárquico del Requerimiento 3 (spec 003, REQ-13) con los mismos artículos. Un clic en
  * una celda de un mapa de calor elige ese algoritmo y ese par en el visor y lo desplaza a la vista. Cada nueva
  * comparación conserva el algoritmo elegido y limpia el par, porque los artículos pueden cambiar.
  */
@@ -56,6 +58,8 @@ function SimilarityPage() {
           <div ref={traceRef}>
             <SimilarityTraceView articles={response.articles} value={selection} onChange={setSelection} />
           </div>
+          <Divider />
+          <ClusteringSection articles={response.articles} />
         </>
       )}
     </Stack>

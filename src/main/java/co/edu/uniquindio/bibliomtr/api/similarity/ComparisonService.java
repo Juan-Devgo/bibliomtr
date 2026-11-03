@@ -110,6 +110,49 @@ public class ComparisonService {
 	}
 
 	/**
+	 * Matriz N×N de una sola fuente de similitud para los artículos pedidos, con la misma validación,
+	 * preprocesamiento, recorrido de pares, tolerancia y detección de PENDIENTE que {@link #compare} (spec 003,
+	 * REQ-10). La usa el clustering jerárquico, que solo necesita la fuente elegida.
+	 *
+	 * <p>Complejidad: O(A · L) en tiempo y espacio de preprocesamiento más N(N+1)/2 llamadas al algoritmo de la
+	 * fuente; O(N²) en espacio por la matriz.
+	 *
+	 * @param articleIds ids de los artículos; puede ser nula (cuenta como 0 ids)
+	 * @param source     resultado del Requerimiento 1 que da la similitud
+	 * @return artículos en el orden de la solicitud, la matriz (o PENDIENTE) y el tiempo de preprocesamiento
+	 * @throws InvalidSelectionException si la selección es inválida (HTTP 400)
+	 * @throws IllegalStateException     si la fuente devuelve una similitud NaN o fuera de [0,1] más el margen
+	 *                                   {@link #SIMILARITY_TOLERANCE} (HTTP 500)
+	 */
+	public SourceMatrix similarityMatrix(List<Long> articleIds, ComparisonAlgorithm source) {
+		List<Article> articles = validator.validateComparison(articleIds);
+		Timed<PreparedArticles> prepared = Stopwatch.time(() -> prepare(articles));
+		return new SourceMatrix(summaries(articles), matrix(source, prepared.value()), prepared.millis());
+	}
+
+	/**
+	 * Matriz de una fuente de similitud con los artículos y el tiempo de preprocesamiento (spec 003, REQ-10,
+	 * REQ-22).
+	 *
+	 * <p>Complejidad: construcción O(N) en tiempo y espacio por la copia de la lista.
+	 *
+	 * @param articles        artículos en el orden de la solicitud (filas y columnas de la matriz)
+	 * @param matrix          matriz de la fuente, o PENDIENTE con la ubicación de su stub
+	 * @param preprocessingMs tiempo en ms del preprocesamiento, sin el de la matriz
+	 */
+	public record SourceMatrix(List<ArticleSummary> articles, AlgorithmMatrix matrix, double preprocessingMs) {
+
+		/**
+		 * Copia defensiva de la lista.
+		 *
+		 * <p>Complejidad: O(N) en tiempo y espacio.
+		 */
+		public SourceMatrix {
+			articles = List.copyOf(articles);
+		}
+	}
+
+	/**
 	 * Resultado y traza de un algoritmo para el par (a, b); {@code a = b} está permitido (REQ-16, REQ-20; AC-15).
 	 *
 	 * <p>Complejidad: O(A · L) en tiempo y espacio de preprocesamiento, más una llamada al algoritmo.

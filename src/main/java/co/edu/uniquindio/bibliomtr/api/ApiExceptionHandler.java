@@ -15,12 +15,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import co.edu.uniquindio.bibliomtr.algorithms.clustering.InvalidDendrogramException;
 import co.edu.uniquindio.bibliomtr.api.benchmark.BenchmarkInProgressException;
 import co.edu.uniquindio.bibliomtr.api.similarity.ArticleSelectionValidator;
 
 /**
  * Traduce los errores de la API a respuestas {@link ProblemDetail} (RFC 9457) con el mensaje en español en
- * {@code detail} (spec 002: REQ-4, AC-3; REQ-19, AC-14. Spec 001: REQ-15, AC-14).
+ * {@code detail} (spec 002: REQ-4, AC-3; REQ-19, AC-14. Spec 001: REQ-15, AC-14. Spec 003: REQ-7, AC-10).
  *
  * <p><b>Casos.</b>
  * <ul>
@@ -34,9 +35,12 @@ import co.edu.uniquindio.bibliomtr.api.similarity.ArticleSelectionValidator;
  *       {@link MissingServletRequestParameterException} → 400 con "Falta el parámetro &lt;nombre&gt;".</li>
  *   <li>Cuerpo ausente o que no es JSON con una lista de enteros:
  *       {@link HttpMessageNotReadableException} → 400 con "El cuerpo debe ser un JSON con articleIds: lista
- *       de enteros" (el único cuerpo JSON de la API es el de {@code POST /api/similarity/comparisons}).</li>
+ *       de enteros" (los cuerpos JSON de la API son los de {@code POST /api/similarity/comparisons} y
+ *       {@code POST /api/clustering}, ambos con {@code articleIds}).</li>
  *   <li>Medición JMH pedida mientras otra está EN_CURSO: {@link BenchmarkInProgressException} → 409 con
  *       "Ya hay una medición en curso".</li>
+ *   <li>Dendrograma inválido de un algoritmo de clustering implementado: {@link InvalidDendrogramException} →
+ *       500 con "El algoritmo &lt;slug&gt; devolvió un dendrograma inválido: &lt;razón&gt;".</li>
  * </ul>
  * Los parámetros validados de la API ({@code n}, {@code bucketSize}) son enteros mayores o iguales a 1, de
  * ahí el mensaje "El parámetro &lt;nombre&gt; debe ser un entero mayor o igual a 1".
@@ -130,6 +134,22 @@ public class ApiExceptionHandler {
 	public ProblemDetail handleBenchmarkInProgress(BenchmarkInProgressException exception) {
 		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
 		problem.setTitle("Conflicto");
+		return problem;
+	}
+
+	/**
+	 * Dendrograma inválido devuelto por un algoritmo de clustering implementado (spec 003, REQ-7, AC-10).
+	 *
+	 * <p>Complejidad: O(1) en tiempo y espacio.
+	 *
+	 * @param exception rechazo de {@code DendrogramValidator} con la razón en español
+	 * @return 500 con ese mensaje
+	 */
+	@ExceptionHandler(InvalidDendrogramException.class)
+	public ProblemDetail handleInvalidDendrogram(InvalidDendrogramException exception) {
+		ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
+				exception.getMessage());
+		problem.setTitle("Error interno");
 		return problem;
 	}
 

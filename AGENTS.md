@@ -7,6 +7,7 @@
 - Idioma: documentación, docstrings/Javadoc y comentarios en español; identificadores de código en inglés.
 - Requerimientos (numeración vigente): 1 similitud textual (spec 001), 2 ranking de términos con ordenamiento (spec 002, agregado con prioridad), 3 clustering jerárquico con dendrograma, 4 coincidencia exacta de cadenas (KMP, Boyer-Moore, Rabin-Karp), 5 despliegue y documentación técnica. El número de spec no tiene que coincidir con el del requerimiento; la correspondencia vive en `docs/traceability.md`.
 - El documento técnico (`docs/documento-tecnico.md`) lo redactan los estudiantes, no los agentes. El flujo SDD solo cubre constitución, specs, planes, tareas, trazabilidad y la guía de implementación; en trazabilidad la sección del documento queda `(pendiente)`.
+- Commit al cerrar cada fase de `tasks.md` implementada: una fase, un commit (Conventional Commits), con las tareas de la fase ya marcadas en `tasks.md`.
 
 ## Stack
 - Backend: Java 25 (toolchain en `build.gradle.kts`), Spring Boot 4.1.x, Gradle Kotlin DSL (`./gradlew`), paquete base `co.edu.uniquindio.bibliomtr`.
