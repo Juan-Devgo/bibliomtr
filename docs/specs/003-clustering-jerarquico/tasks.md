@@ -47,11 +47,11 @@
 - [x] T038 Verificar `npm test`, `npm run lint` y `npm run build` en `web/` y `./gradlew test` (`ForbiddenSortUsageTest`, `ForbiddenClusteringUsageTest`) en verde (REQ-15, AC-2)
 
 ## Phase 5: Visor de traza del clustering
-- [ ] T039 Crear las fórmulas KaTeX en `web/src/features/clustering/clusteringFormulas.ts` (REQ-17)
-- [ ] T040 Crear `LinkageTraceView` y `DianaTraceView` en `web/src/features/clustering/` (REQ-16, REQ-17)
-- [ ] T041 Crear `ClusteringTraceView` y conectar "Ver traza" de las tarjetas en `web/src/features/clustering/ClusteringTraceView.tsx` y `ClusteringSection.tsx` (REQ-16, REQ-17, REQ-18)
-- [ ] T042 Crear `ClusteringTraceView.test.tsx` en `web/src/features/clustering/` (REQ-17, AC-15)
-- [ ] T043 Verificar `npm test`, `npm run lint` y `npm run build` en `web/` (REQ-17)
+- [x] T039 Crear las fórmulas KaTeX en `web/src/features/clustering/clusteringFormulas.ts` (REQ-17)
+- [x] T040 Crear `LinkageTraceView` y `DianaTraceView` en `web/src/features/clustering/` (REQ-16, REQ-17)
+- [x] T041 Crear `ClusteringTraceView` y conectar "Ver traza" de las tarjetas en `web/src/features/clustering/ClusteringTraceView.tsx` y `ClusteringSection.tsx` (REQ-16, REQ-17, REQ-18)
+- [x] T042 Crear `ClusteringTraceView.test.tsx` en `web/src/features/clustering/` (REQ-17, AC-15)
+- [x] T043 Verificar `npm test`, `npm run lint` y `npm run build` en `web/` (REQ-17)
 
 ## Phase 6: Guía, trazabilidad y README
 - [ ] T044 Agregar la sección "## 10. Requerimiento 3: Clustering jerárquico" con un apartado por stub, el título general y la declaración de IA en `docs/guia-implementacion.md` (REQ-20, AC-18)

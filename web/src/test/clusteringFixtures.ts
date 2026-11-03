@@ -1,12 +1,16 @@
 /**
  * Datos de prueba de la spec 003 compartidos por los tests de la interfaz de clustering: los 4 artículos y la
- * matriz D₄ del caso a mano de la guía, con los dendrogramas esperados de cada algoritmo.
+ * matriz D₄ del caso a mano de la guía, con los dendrogramas esperados de cada algoritmo y las trazas de Single
+ * Linkage y DIANA.
  */
 import {
   CLUSTERING_ALGORITHM_LABELS,
   type ClusteringAlgorithmSlug,
   type ClusteringResponse,
+  type ClusteringTraceResponse,
   type DendrogramResult,
+  type DianaTrace,
+  type LinkageTrace,
   type Merge,
 } from '@/types/clustering'
 import type { ArticleSummary } from '@/types/similarity'
@@ -85,4 +89,143 @@ export const CLUSTERING_D4: ClusteringResponse = {
     calculatedDendrogram('average-linkage', 0.75),
     calculatedDendrogram('diana', 1),
   ],
+}
+
+/** Traza de Single Linkage sobre D₄ (plan §6). */
+export const SINGLE_TRACE_D4: LinkageTrace = {
+  steps: [
+    {
+      clusters: [0, 1, 2, 3],
+      members: [[0], [1], [2], [3]],
+      distances: D4,
+      left: 0,
+      right: 1,
+      distance: 0.2,
+      newCluster: 4,
+      remaining: [2, 3],
+      updatedRow: [0.3, 0.6],
+    },
+    {
+      clusters: [2, 3, 4],
+      members: [[2], [3], [0, 1]],
+      distances: [
+        [0, 0.45, 0.3],
+        [0.45, 0, 0.6],
+        [0.3, 0.6, 0],
+      ],
+      left: 2,
+      right: 4,
+      distance: 0.3,
+      newCluster: 5,
+      remaining: [3],
+      updatedRow: [0.45],
+    },
+    {
+      clusters: [3, 5],
+      members: [[3], [0, 1, 2]],
+      distances: [
+        [0, 0.45],
+        [0.45, 0],
+      ],
+      left: 3,
+      right: 5,
+      distance: 0.45,
+      newCluster: 6,
+      remaining: [],
+      updatedRow: [],
+    },
+  ],
+}
+
+/** Traza de DIANA sobre D₄ (plan §6). */
+export const DIANA_TRACE_D4: DianaTrace = {
+  steps: [
+    {
+      clusters: [[0, 1, 2, 3]],
+      diameters: [0.7],
+      splitIndex: 0,
+      diameter: 0.7,
+      iterations: [
+        {
+          splinter: [],
+          remainder: [0, 1, 2, 3],
+          averageToRemainder: [1.4 / 3, 1.1 / 3, 1.25 / 3, 1.75 / 3],
+          averageToSplinter: [0, 0, 0, 0],
+          differences: [1.4 / 3, 1.1 / 3, 1.25 / 3, 1.75 / 3],
+          moved: 3,
+        },
+        {
+          splinter: [3],
+          remainder: [0, 1, 2],
+          averageToRemainder: [0.35, 0.25, 0.4],
+          averageToSplinter: [0.7, 0.6, 0.45],
+          differences: [-0.35, -0.35, -0.05],
+          moved: -1,
+        },
+      ],
+      splinter: [3],
+      remainder: [0, 1, 2],
+    },
+    {
+      clusters: [[0, 1, 2], [3]],
+      diameters: [0.5, 0],
+      splitIndex: 0,
+      diameter: 0.5,
+      iterations: [
+        {
+          splinter: [],
+          remainder: [0, 1, 2],
+          averageToRemainder: [0.35, 0.25, 0.4],
+          averageToSplinter: [0, 0, 0],
+          differences: [0.35, 0.25, 0.4],
+          moved: 2,
+        },
+        {
+          splinter: [2],
+          remainder: [0, 1],
+          averageToRemainder: [0.2, 0.2],
+          averageToSplinter: [0.5, 0.3],
+          differences: [-0.3, -0.1],
+          moved: -1,
+        },
+      ],
+      splinter: [2],
+      remainder: [0, 1],
+    },
+    {
+      clusters: [[0, 1], [2], [3]],
+      diameters: [0.2, 0, 0],
+      splitIndex: 0,
+      diameter: 0.2,
+      iterations: [
+        {
+          splinter: [],
+          remainder: [0, 1],
+          averageToRemainder: [0.2, 0.2],
+          averageToSplinter: [0, 0],
+          differences: [0.2, 0.2],
+          moved: 0,
+        },
+      ],
+      splinter: [0],
+      remainder: [1],
+    },
+  ],
+}
+
+/** Respuesta de `GET /api/clustering/trace` de `algorithm` sobre D₄ con su traza. */
+export function traceResponse(algorithm: ClusteringAlgorithmSlug, trace: LinkageTrace | DianaTrace): ClusteringTraceResponse {
+  return {
+    algorithm,
+    label: CLUSTERING_ALGORITHM_LABELS[algorithm],
+    articles: CLUSTERING_ARTICLES,
+    source: CLUSTERING_D4.source,
+    preparationMs: 2.5,
+    distances: D4,
+    status: 'CALCULADO',
+    merges: D4_MERGES[algorithm],
+    trace,
+    elapsedMs: 0.125,
+    pendingLocation: null,
+  } as ClusteringTraceResponse
 }
