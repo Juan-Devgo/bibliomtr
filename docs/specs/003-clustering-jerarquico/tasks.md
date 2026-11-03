@@ -35,16 +35,16 @@
 - [x] T028 Verificar `./gradlew test` en verde, incluido `ComparisonApiIT` (REQ-10, AC-3)
 
 ## Phase 4: Sección de dendrogramas en la interfaz
-- [ ] T029 Crear los tipos en `web/src/types/clustering.ts` (REQ-11, REQ-16)
-- [ ] T030 Crear `useClustering` y `useClusteringTrace` en `web/src/api/` (REQ-13, REQ-16)
-- [ ] T031 Crear `toHierarchy` en `web/src/features/clustering/dendrogramTree.ts` y su test `dendrogramTree.test.ts` (REQ-15, AC-14)
-- [ ] T032 Crear el componente D3 en `web/src/components/Dendrogram.tsx` y su test `Dendrogram.test.tsx` (REQ-14, REQ-15, AC-14)
-- [ ] T033 Crear `SourceSelector` y `DendrogramCard` en `web/src/features/clustering/` (REQ-13, REQ-14, REQ-18, REQ-22)
-- [ ] T034 Crear las respuestas de ejemplo con D₄ en `web/src/test/clusteringFixtures.ts` (REQ-14, REQ-16)
-- [ ] T035 Crear `ClusteringSection` con selector, tiempos, aviso de fuente pendiente y cuadrícula 2×2 en `web/src/features/clustering/ClusteringSection.tsx` (REQ-13, REQ-14, REQ-18, REQ-19, REQ-22)
-- [ ] T036 Crear `ClusteringSection.test.tsx` en `web/src/features/clustering/` (REQ-13, REQ-14, REQ-18, REQ-19, REQ-22, AC-13, AC-14, AC-16, AC-17, AC-19)
-- [ ] T037 Agregar `ClusteringSection` tras el visor de traza en `web/src/pages/SimilarityPage.tsx` (REQ-13)
-- [ ] T038 Verificar `npm test`, `npm run lint` y `npm run build` en `web/` y `./gradlew test` (`ForbiddenSortUsageTest`, `ForbiddenClusteringUsageTest`) en verde (REQ-15, AC-2)
+- [x] T029 Crear los tipos en `web/src/types/clustering.ts` (REQ-11, REQ-16)
+- [x] T030 Crear `useClustering` y `useClusteringTrace` en `web/src/api/` (REQ-13, REQ-16)
+- [x] T031 Crear `toHierarchy` en `web/src/features/clustering/dendrogramTree.ts` y su test `dendrogramTree.test.ts` (REQ-15, AC-14)
+- [x] T032 Crear el componente D3 en `web/src/components/Dendrogram.tsx` y su test `Dendrogram.test.tsx` (REQ-14, REQ-15, AC-14)
+- [x] T033 Crear `SourceSelector` y `DendrogramCard` en `web/src/features/clustering/` (REQ-13, REQ-14, REQ-18, REQ-22)
+- [x] T034 Crear las respuestas de ejemplo con D₄ en `web/src/test/clusteringFixtures.ts` (REQ-14, REQ-16)
+- [x] T035 Crear `ClusteringSection` con selector, tiempos, aviso de fuente pendiente y cuadrícula 2×2 en `web/src/features/clustering/ClusteringSection.tsx` (REQ-13, REQ-14, REQ-18, REQ-19, REQ-22)
+- [x] T036 Crear `ClusteringSection.test.tsx` en `web/src/features/clustering/` (REQ-13, REQ-14, REQ-18, REQ-19, REQ-22, AC-13, AC-14, AC-16, AC-17, AC-19)
+- [x] T037 Agregar `ClusteringSection` tras el visor de traza en `web/src/pages/SimilarityPage.tsx` (REQ-13)
+- [x] T038 Verificar `npm test`, `npm run lint` y `npm run build` en `web/` y `./gradlew test` (`ForbiddenSortUsageTest`, `ForbiddenClusteringUsageTest`) en verde (REQ-15, AC-2)
 
 ## Phase 5: Visor de traza del clustering
 - [ ] T039 Crear las fórmulas KaTeX en `web/src/features/clustering/clusteringFormulas.ts` (REQ-17)
