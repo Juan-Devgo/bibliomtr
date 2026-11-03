@@ -41,20 +41,20 @@
 - [x] T034 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `feat: API de búsqueda de patrones (fase 3 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
 
 ## Phase 4: Pestaña "Búsqueda Patrones"
-- [ ] T035 Crear los tipos en `web/src/types/patternSearch.ts` (REQ-15, REQ-22)
-- [ ] T036 Crear `usePatternSearch` y `usePatternTrace` en `web/src/api/` (REQ-15, REQ-22)
-- [ ] T037 Crear `highlightSegments.test.ts` en `web/src/features/pattern-search/` (REQ-20, REQ-21, AC-15)
-- [ ] T038 Crear `highlightSegments` en `web/src/features/pattern-search/highlightSegments.ts` (REQ-20, REQ-21, AC-15)
-- [ ] T039 Crear las respuestas de ejemplo de búsqueda (implementados, solo KMP, corpus vacío, posiciones de fixture que no son ocurrencias) en `web/src/test/patternSearchFixtures.ts` (REQ-15, REQ-20, REQ-28)
-- [ ] T040 Crear `PatternSearchForm` con patrón, q opcional y "Buscar" sin recortar el patrón en `web/src/features/pattern-search/PatternSearchForm.tsx` (REQ-19, AC-25)
-- [ ] T041 Crear `AlgorithmOccurrencesTable` y `PatternSearchResults` (tiempos, total, colisiones, pendiente, indicador, "Sin abstracts en el corpus", errores) en `web/src/features/pattern-search/` (REQ-16, REQ-18, REQ-20, REQ-28, REQ-29, AC-13, AC-14, AC-20, AC-21)
-- [ ] T042 Crear `AlgorithmSelector` con `defaultAlgorithm` y `HighlightedAbstract` en `web/src/features/pattern-search/` (REQ-20, REQ-21, AC-15)
-- [ ] T043 Crear `PatternSearchView` en `web/src/features/pattern-search/PatternSearchView.tsx` y la página `web/src/pages/PatternSearchPage.tsx` (REQ-19, REQ-20)
-- [ ] T044 Crear `PatternSearchView.test.tsx` en `web/src/features/pattern-search/` (REQ-17, REQ-18, REQ-19, REQ-20, REQ-21, REQ-28, REQ-29, AC-13, AC-14, AC-15, AC-20, AC-21, AC-25)
-- [ ] T045 Crear `App.test.tsx` en `web/src/App.test.tsx` y agregar la pestaña "Búsqueda Patrones" con carga diferida en `web/src/App.tsx` (REQ-19)
-- [ ] T046 Agregar a `ForbiddenStringMatchingUsageTest` la verificación por nombre de `web/src/features/pattern-search` y de los `web/src/components` que importa, y la de librerías de búsqueda en `web/src` y `web/package.json`, en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/stringmatching/ForbiddenStringMatchingUsageTest.java` (REQ-14, REQ-21, AC-2)
-- [ ] T047 Verificar `npm test`, `npm run lint` y `npm run build` en `web/` y `./gradlew test` en verde (REQ-14, REQ-21, AC-2)
-- [ ] T048 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `feat: pestaña Búsqueda Patrones (fase 4 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+- [x] T035 Crear los tipos en `web/src/types/patternSearch.ts` (REQ-15, REQ-22)
+- [x] T036 Crear `usePatternSearch` y `usePatternTrace` en `web/src/api/` (REQ-15, REQ-22)
+- [x] T037 Crear `highlightSegments.test.ts` en `web/src/features/pattern-search/` (REQ-20, REQ-21, AC-15)
+- [x] T038 Crear `highlightSegments` en `web/src/features/pattern-search/highlightSegments.ts` (REQ-20, REQ-21, AC-15)
+- [x] T039 Crear las respuestas de ejemplo de búsqueda (implementados, solo KMP, corpus vacío, posiciones de fixture que no son ocurrencias) en `web/src/test/patternSearchFixtures.ts` (REQ-15, REQ-20, REQ-28)
+- [x] T040 Crear `PatternSearchForm` con patrón, q opcional y "Buscar" sin recortar el patrón en `web/src/features/pattern-search/PatternSearchForm.tsx` (REQ-19, AC-25)
+- [x] T041 Crear `AlgorithmOccurrencesTable` y `PatternSearchResults` (tiempos, total, colisiones, pendiente, indicador, "Sin abstracts en el corpus", errores) en `web/src/features/pattern-search/` (REQ-16, REQ-18, REQ-20, REQ-28, REQ-29, AC-13, AC-14, AC-20, AC-21)
+- [x] T042 Crear `AlgorithmSelector` con `defaultAlgorithm` y `HighlightedAbstract` en `web/src/features/pattern-search/` (REQ-20, REQ-21, AC-15)
+- [x] T043 Crear `PatternSearchView` en `web/src/features/pattern-search/PatternSearchView.tsx` y la página `web/src/pages/PatternSearchPage.tsx` (REQ-19, REQ-20)
+- [x] T044 Crear `PatternSearchView.test.tsx` en `web/src/features/pattern-search/` (REQ-17, REQ-18, REQ-19, REQ-20, REQ-21, REQ-28, REQ-29, AC-13, AC-14, AC-15, AC-20, AC-21, AC-25)
+- [x] T045 Crear `App.test.tsx` en `web/src/App.test.tsx` y agregar la pestaña "Búsqueda Patrones" con carga diferida en `web/src/App.tsx` (REQ-19)
+- [x] T046 Agregar a `ForbiddenStringMatchingUsageTest` la verificación por nombre de `web/src/features/pattern-search` y de los `web/src/components` que importa, y la de librerías de búsqueda en `web/src` y `web/package.json`, en `src/test/java/co/edu/uniquindio/bibliomtr/algorithms/stringmatching/ForbiddenStringMatchingUsageTest.java` (REQ-14, REQ-21, AC-2)
+- [x] T047 Verificar `npm test`, `npm run lint` y `npm run build` en `web/` y `./gradlew test` en verde (REQ-14, REQ-21, AC-2)
+- [x] T048 Marcar las tareas de la fase en `docs/specs/004-busqueda-patrones/tasks.md` y crear el commit `feat: pestaña Búsqueda Patrones (fase 4 de la spec 004)` con solo los archivos de la fase (sin `AGENTS.md`), terminado en `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
 
 ## Phase 5: Visor de traza de la búsqueda de patrones
 - [ ] T049 Agregar a `web/src/test/patternSearchFixtures.ts` las trazas de "abababca"/"abab" de los 3 algoritmos, la de colisión "abba"/"ab" con q = 3 y una pendiente (REQ-23, REQ-24, REQ-25, REQ-28)

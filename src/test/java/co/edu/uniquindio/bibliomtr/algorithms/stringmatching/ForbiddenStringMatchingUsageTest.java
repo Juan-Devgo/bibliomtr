@@ -7,7 +7,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -36,9 +38,14 @@ import org.junit.jupiter.api.Test;
  * ni contenido de cadenas, los nombres {@code RegExp}, {@code indexOf}, {@code lastIndexOf}, {@code includes},
  * {@code search}, {@code match}, {@code matchAll}, {@code split}, {@code replace}, {@code replaceAll},
  * {@code startsWith} y {@code endsWith} como identificadores completos, aunque se usen sobre arreglos
- * ({@code searchMs} no cuenta). La interpolación {@code ${…}} de las plantillas se conserva como código. La
- * verificación de los archivos de la pestaña "Búsqueda Patrones" se agrega con la interfaz (fase 4 de la spec 004);
- * aquí solo se prueba el detector.
+ * ({@code searchMs} no cuenta). La interpolación {@code ${…}} de las plantillas se conserva como código. Se
+ * aplica a los {@code .ts}/{@code .tsx} de producción de {@code web/src/features/pattern-search} (se excluyen
+ * {@code *.test.*} y {@code *.spec.*}) y a cada archivo de {@code web/src/components} que esos archivos importan
+ * directamente, con {@code @/components/…} o con una ruta relativa.
+ *
+ * <p><b>Librerías de búsqueda.</b> En el resto de la interfaz solo se revisa que {@code web/package.json} no declare
+ * y que ningún {@code .ts}/{@code .tsx} de {@code web/src} importe {@code fuse.js}, {@code flexsearch},
+ * {@code lunr}, {@code elasticlunr}, {@code minisearch}, {@code fuzzysort} ni {@code match-sorter}.
  *
  * <p>Complejidad: O(L) en tiempo, con L = número total de caracteres recorridos, y O(l) en espacio, con
  * l = tamaño del archivo más grande.
@@ -50,6 +57,11 @@ class ForbiddenStringMatchingUsageTest {
 	private static final Path TRACES = MAIN.resolve(Path.of("trace", "stringmatching"));
 	private static final Path API = MAIN.resolve(Path.of("api", "stringmatching"));
 
+	private static final Path WEB_SOURCES = Path.of("web", "src");
+	private static final Path WEB_PACKAGE = Path.of("web", "package.json");
+	private static final Path PATTERN_SEARCH_FEATURE = WEB_SOURCES.resolve(Path.of("features", "pattern-search"));
+	private static final Path WEB_COMPONENTS = WEB_SOURCES.resolve("components");
+
 	private static final String REGEX_PACKAGE = "java.util.regex";
 
 	private static final Pattern JAVA_FORBIDDEN_CALLS = Pattern.compile("\\.\\s*(?:indexOf|lastIndexOf|contains"
@@ -59,6 +71,18 @@ class ForbiddenStringMatchingUsageTest {
 
 	private static final Pattern TS_FORBIDDEN_NAMES = Pattern.compile("(?<![\\w$])(?:RegExp|indexOf|lastIndexOf"
 			+ "|includes|search|match|matchAll|split|replace|replaceAll|startsWith|endsWith)(?![\\w$])");
+
+	/** Especificador de un import estático, de efecto lateral o dinámico; el grupo 2 es la ruta. */
+	private static final Pattern TS_IMPORT = Pattern.compile("(?:\\bfrom\\s*|\\bimport\\s*\\(\\s*|\\bimport\\s+)(['\"])"
+			+ "([^'\"\\n]+)\\1");
+
+	private static final String SEARCH_LIBRARIES = "(?:fuse\\.js|flexsearch|lunr|elasticlunr|minisearch|fuzzysort"
+			+ "|match-sorter)";
+
+	private static final Pattern NPM_DEPENDENCY = Pattern.compile("\"" + SEARCH_LIBRARIES + "\"\\s*:");
+
+	private static final Pattern NPM_IMPORT = Pattern.compile("(?:\\bfrom\\s*|\\bimport\\s*\\(\\s*|\\bimport\\s+"
+			+ "|\\brequire\\s*\\(\\s*)['\"]" + SEARCH_LIBRARIES + "(?:/[^'\"]*)?['\"]");
 
 	@Test
 	@DisplayName("AC-2: algorithms, trace y api de búsqueda de patrones no usan búsquedas nativas ni regex")
@@ -76,6 +100,74 @@ class ForbiddenStringMatchingUsageTest {
 			}
 		}
 		assertThat(violations).isEmpty();
+	}
+
+	@Test
+	@DisplayName("AC-2: la pestaña Búsqueda Patrones y los componentes que importa no usan búsquedas nativas")
+	void patternSearchFeatureHasNoForbiddenNames() {
+		if (!Files.isDirectory(WEB_SOURCES)) {
+			return;
+		}
+		assertThat(PATTERN_SEARCH_FEATURE).as("feature de la pestaña Búsqueda Patrones").isDirectory();
+		List<Path> featureFiles = new ArrayList<>();
+		for (Path file : sourceFiles(PATTERN_SEARCH_FEATURE, ".ts", ".tsx")) {
+			if (isProduction(file)) {
+				featureFiles.add(file);
+			}
+		}
+		assertThat(featureFiles).as("archivos de producción de la feature").isNotEmpty();
+		Set<Path> scanned = new LinkedHashSet<>(featureFiles);
+		for (Path file : featureFiles) {
+			scanned.addAll(importedComponents(file, read(file)));
+		}
+		List<String> violations = new ArrayList<>();
+		for (Path file : scanned) {
+			violations.addAll(typescriptViolations(file.toString(), read(file)));
+		}
+		assertThat(violations).isEmpty();
+	}
+
+	@Test
+	@DisplayName("AC-2: la interfaz no depende ni importa librerías de búsqueda")
+	void webHasNoSearchLibraries() {
+		if (!Files.isDirectory(WEB_SOURCES)) {
+			return;
+		}
+		List<String> violations = new ArrayList<>(matches(WEB_PACKAGE.toString(), read(WEB_PACKAGE), NPM_DEPENDENCY));
+		for (Path file : sourceFiles(WEB_SOURCES, ".ts", ".tsx")) {
+			violations.addAll(matches(file.toString(), read(file), NPM_IMPORT));
+		}
+		assertThat(violations).isEmpty();
+	}
+
+	@Test
+	@DisplayName("AC-2: el detector web resuelve los componentes importados y marca las librerías de búsqueda")
+	void webDetectorsRecognizePatterns() {
+		Path feature = PATTERN_SEARCH_FEATURE.resolve("Example.tsx");
+		String source = """
+				import TraceStep from '@/components/TraceStep'
+				import { Button } from '../../components/ui/button'
+				import { formatMs } from '@/features/similarity-matrix/resultFormat'
+				import Paper from '@mui/material/Paper'
+				const Heatmap = lazy(() => import('@/components/Heatmap'))
+				""";
+		assertThat(importedComponents(feature, source)).containsExactly(
+				WEB_COMPONENTS.resolve("TraceStep.tsx"),
+				WEB_COMPONENTS.resolve(Path.of("ui", "button.tsx")),
+				WEB_COMPONENTS.resolve("Heatmap.tsx"));
+		assertThat(importedComponents(feature, "import x from '@/components/NoExiste'")).isEmpty();
+
+		// Librerías de búsqueda: deben fallar.
+		assertThat(matches("C", "\"fuse.js\": \"^7.0.0\"", NPM_DEPENDENCY)).hasSize(1);
+		assertThat(matches("C", "\"match-sorter\": \"^6.3.4\"", NPM_DEPENDENCY)).hasSize(1);
+		assertThat(matches("D", "import Fuse from 'fuse.js'", NPM_IMPORT)).hasSize(1);
+		assertThat(matches("D", "import { matchSorter } from \"match-sorter\"", NPM_IMPORT)).hasSize(1);
+		assertThat(matches("D", "const lunr = require('lunr')", NPM_IMPORT)).hasSize(1);
+		assertThat(matches("D", "const m = await import('minisearch/dist/es')", NPM_IMPORT)).hasSize(1);
+		// Deben pasar.
+		assertThat(matches("C", "\"recharts\": \"^3.10.1\"", NPM_DEPENDENCY)).isEmpty();
+		assertThat(matches("D", "import * as d3 from 'd3'", NPM_IMPORT)).isEmpty();
+		assertThat(matches("D", "import { usePatternSearch } from '@/api/usePatternSearch'", NPM_IMPORT)).isEmpty();
 	}
 
 	@Test
@@ -139,6 +231,48 @@ class ForbiddenStringMatchingUsageTest {
 	 */
 	static List<String> typescriptViolations(String file, String source) {
 		return matches(file, stripCommentsAndStrings(source, true), TS_FORBIDDEN_NAMES);
+	}
+
+	/**
+	 * Archivos de {@code web/src/components} que {@code file} importa directamente, con {@code @/components/…} o con
+	 * una ruta relativa, resueltos a un archivo existente ({@code .tsx}, {@code .ts}, {@code index.tsx} o
+	 * {@code index.ts}). Los imports que no apuntan a {@code web/src/components} o que no se resuelven se ignoran.
+	 *
+	 * <p>Complejidad: O(l) en tiempo y espacio, con l = longitud del archivo.
+	 */
+	static List<Path> importedComponents(Path file, String source) {
+		Path components = WEB_COMPONENTS.normalize();
+		Set<Path> found = new LinkedHashSet<>();
+		Matcher matcher = TS_IMPORT.matcher(source);
+		while (matcher.find()) {
+			String specifier = matcher.group(2);
+			Path target;
+			if (specifier.startsWith("@/")) {
+				target = WEB_SOURCES.resolve(specifier.substring(2));
+			} else if (specifier.startsWith(".")) {
+				target = file.getParent().resolve(specifier);
+			} else {
+				continue;
+			}
+			target = target.normalize();
+			if (!target.startsWith(components)) {
+				continue;
+			}
+			for (String candidate : List.of(".tsx", ".ts", "/index.tsx", "/index.ts", "")) {
+				Path resolved = Path.of(target + candidate);
+				if (Files.isRegularFile(resolved)) {
+					found.add(resolved);
+					break;
+				}
+			}
+		}
+		return new ArrayList<>(found);
+	}
+
+	/** Un archivo de la interfaz es de producción si no es un test ({@code *.test.*} ni {@code *.spec.*}). */
+	private static boolean isProduction(Path file) {
+		String name = file.getFileName().toString();
+		return !name.contains(".test.") && !name.contains(".spec.");
 	}
 
 	/** Una entrada {@code archivo: coincidencia} por cada aparición del patrón. */
