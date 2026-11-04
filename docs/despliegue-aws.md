@@ -211,7 +211,7 @@ free -h
 ### 6.4 Memoria agotada
 
 - Síntoma: un contenedor se reinicia solo, `OOMKilled=true` en `docker inspect`, o el build de `api` o de `web` termina con "Killed".
-- Causa: swap inactivo, una medición JMH lanzada durante la ingesta inicial, dos mediciones a la vez, o el build de Gradle o de npm en una máquina de 4 GB sin swap.
+- Causa: swap inactivo, una medición JMH lanzada durante la ingesta inicial, dos mediciones a la vez, o el build de Gradle o de npm en una máquina de 4 GB sin swap. Si `api` termina con `OutOfMemoryError: Java heap space` justo después de `Cargando SPECTER2 desde class path resource`, la imagen se construyó con un `Dockerfile` que no copia el modelo a `/app/models/`: actualice el repositorio y reconstruya con `docker compose -f compose.prod.yaml up -d --build`.
 - Corrección: verifique `swapon --show` (debe aparecer `/swapfile`; si no, vuelva a ejecutar el bootstrap, que lo crea antes del build); no lance JMH durante la ingesta ni dos a la vez; reinicie el servicio caído con `docker compose -f compose.prod.yaml up -d`. La JVM de `api` usa `-XX:+ExitOnOutOfMemoryError`, así que un OOM de Java la reinicia por `restart: unless-stopped`.
 
 ### 6.5 Descarga lenta del modelo de Ollama
