@@ -17,12 +17,13 @@ const TICK_COUNT = 5
 const DEFAULT_MAX_HEIGHT = 1
 
 /**
- * Altura máxima del eje, común a los dendrogramas de una misma vista (spec 003, REQ-14): la mayor altura de sus
- * fusiones redondeada hacia arriba a un valor "limpio" (p. ej. 0.047 → 0.05). Sin fusiones con altura positiva
+ * Altura máxima del eje de un dendrograma (spec 003, REQ-14): la mayor altura de sus fusiones redondeada hacia
+ * arriba a un valor "limpio" (p. ej. 0.047 → 0.05). Cada dendrograma tiene su propio eje, así que un algoritmo con
+ * alturas pequeñas ocupa todo el ancho en vez de quedar aplastado junto al cero. Sin fusiones con altura positiva
  * devuelve 1.
  */
-export function sharedMaxHeight(mergeLists: readonly (readonly Merge[])[]): number {
-  const max = Math.max(0, ...mergeLists.flatMap((merges) => merges.map((merge) => merge.height)))
+export function axisMaxHeight(merges: readonly Merge[]): number {
+  const max = Math.max(0, ...merges.map((merge) => merge.height))
   return max > 0 ? scaleLinear().domain([0, max]).nice(TICK_COUNT - 1).domain()[1] : DEFAULT_MAX_HEIGHT
 }
 
