@@ -1,7 +1,11 @@
 package co.edu.uniquindio.bibliomtr.algorithms.stringmatching;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import co.edu.uniquindio.bibliomtr.trace.stringmatching.RabinKarpPreprocessing;
 import co.edu.uniquindio.bibliomtr.trace.stringmatching.RabinKarpTrace;
+import co.edu.uniquindio.bibliomtr.trace.stringmatching.RabinKarpTrace.Window;
 
 /**
  * Rabin-Karp (Requerimiento 4). STUB: los cuerpos de {@link #preprocess} y {@link #search} los escribe el
@@ -65,8 +69,26 @@ public final class RabinKarp implements StringMatcher<RabinKarpPreprocessing, Ra
 	 */
 	@Override
 	public RabinKarpPreprocessing preprocess(String pattern, MatchOptions options) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar RabinKarp.preprocess (ver docs/guia-implementacion.md § 11)");
+
+  	if (pattern == null || pattern.isEmpty()) {
+  		throw new IllegalArgumentException("El patrón no puede ser nulo ni vacío");
+  	}
+  	long d = MatchOptions.D;
+  	long q = options.q();
+  	int m = pattern.length();
+
+  	// h = d^(m−1) mod q, multiplicando de a uno y reduciendo en cada paso para no desbordar.
+  	long h = 1;
+  	for (int i = 0; i < m - 1; i++) {
+  		h = (h * d) % q;
+  	}
+
+  	// hash(P) con la regla de Horner: t ← (d·t + P[i]) mod q.
+  	long patternHash = 0;
+  	for (int i = 0; i < m; i++) {
+  		patternHash = (d * patternHash + pattern.charAt(i)) % q;
+  	}
+  	return new RabinKarpPreprocessing(pattern, d, q, h, patternHash);
 	}
 
 	/**
@@ -80,10 +102,61 @@ public final class RabinKarp implements StringMatcher<RabinKarpPreprocessing, Ra
 	 * @return posiciones ascendentes, colisiones ascendentes y la traza {@link RabinKarpTrace} (o {@code null})
 	 */
 	@Override
-	public MatchResult<RabinKarpTrace> search(String text, RabinKarpPreprocessing preprocessed,
-			MatchOptions options) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar RabinKarp.search (ver docs/guia-implementacion.md § 11)");
+	public MatchResult<RabinKarpTrace> search(String text, RabinKarpPreprocessing preprocessed, MatchOptions options) {
+
+  	String pattern = preprocessed.pattern();
+  	long d = preprocessed.d();
+  	long q = preprocessed.q();
+  	long h = preprocessed.h();
+  	long patternHash = preprocessed.patternHash();
+  	int n = text.length();
+  	int m = pattern.length();
+  	List<Integer> positions = new ArrayList<>();
+  	List<Integer> collisions = new ArrayList<>();
+  	List<Window> windows = new ArrayList<>();
+  	Long initialWindowHash = null;
+
+  	if (n >= m) {
+  		// t(0): hash de la primera ventana T[0..m−1] con Horner.
+  		long windowHash = 0;
+  		for (int i = 0; i < m; i++) {
+  			windowHash = (d * windowHash + text.charAt(i)) % q;
+  		}
+  		initialWindowHash = windowHash;
+
+  		for (int s = 0; s <= n - m; s++) {
+  			boolean hashMatches = windowHash == patternHash;
+  			Boolean verified = null;
+  			boolean collision = false;
+  			if (hashMatches) {
+  				// Hash igual no implica texto igual: se verifica carácter a carácter.
+  				verified = true;
+  				for (int k = 0; k < m; k++) {
+  					if (text.charAt(s + k) != pattern.charAt(k)) {
+  						verified = false;
+  						break;
+  					}
+  				}
+  				if (verified) {
+  					positions.add(s);
+  				} else {
+  					collision = true;
+  					collisions.add(s);
+  				}
+  			}
+  			if (options.recordTrace()) {
+  				windows.add(new Window(s, windowHash, hashMatches, verified, collision));
+  			}
+  			// Rolling hash: quita T[s], desplaza una posición y agrega T[s + m]; floorMod lo deja en [0, q).
+  			if (s < n - m) {
+  				windowHash = Math.floorMod(d * (windowHash - text.charAt(s) * h) + text.charAt(s + m), q);
+  			}
+  		}
+  	}
+  	RabinKarpTrace trace = options.recordTrace()
+  			? new RabinKarpTrace(preprocessed.d(), q, h, patternHash, initialWindowHash, windows, collisions, positions)
+  			: null;
+  	return new MatchResult<>(positions, collisions, trace);
 	}
 
 }
