@@ -3,10 +3,10 @@ import { cluster, hierarchy } from 'd3'
 import { useMemo } from 'react'
 import { toHierarchy, type DendrogramNode } from '@/features/clustering/dendrogramTree'
 import type { Merge } from '@/types/clustering'
-import { DENDROGRAM_WIDTH, HEIGHT_TICKS, heightScale } from './dendrogramScale'
+import { createHeightScale, DENDROGRAM_WIDTH, heightTicks } from './dendrogramScale'
 
 /** Alto de la fila de cada hoja. */
-const ROW_HEIGHT = 22
+const ROW_HEIGHT = 30
 /** Margen superior. */
 const TOP_MARGIN = 8
 /** Alto del eje de alturas y su título. */
@@ -21,6 +21,8 @@ interface DendrogramProps {
   titles?: readonly string[]
   /** Nombre accesible del SVG. */
   ariaLabel: string
+  /** Altura máxima del eje; los dendrogramas que se comparan deben recibir la misma. Por defecto, 1. */
+  maxHeight?: number
 }
 
 /** Posición de un nodo en el lienzo. */
@@ -40,13 +42,15 @@ interface Link {
  * Dendrograma horizontal dibujado con D3 (spec 003, REQ-14, REQ-15).
  *
  * D3 solo ubica los nodos: `hierarchy` + `cluster` reparten las hojas en filas, en el orden de los hijos que da
- * la API, y `scaleLinear` lleva la altura de cada fusión, en [0,1], al eje horizontal. No calcula fusiones,
+ * la API, y `scaleLinear` lleva la altura de cada fusión, en [0, `maxHeight`], al eje horizontal. No calcula fusiones,
  * alturas, cortes ni grupos, ni reordena las hojas. Cada hoja muestra su etiqueta y, al pasar el cursor, el
  * título completo; cada fusión, su grupo, altura y tamaño.
  *
  * Complejidad por render: O(N) en tiempo y espacio, con N hojas.
  */
-function Dendrogram({ merges, labels, titles = labels, ariaLabel }: DendrogramProps) {
+function Dendrogram({ merges, labels, titles = labels, ariaLabel, maxHeight = 1 }: DendrogramProps) {
+  const heightScale = useMemo(() => createHeightScale(maxHeight), [maxHeight])
+  const ticks = useMemo(() => heightTicks(maxHeight), [maxHeight])
   const layout = useMemo(() => {
     const root = hierarchy(toHierarchy(merges, labels))
     const n = labels.length
@@ -73,7 +77,7 @@ function Dendrogram({ merges, labels, titles = labels, ariaLabel }: DendrogramPr
       }
     }
     return { positioned: [...positioned.values()], links, plotBottom: TOP_MARGIN + n * ROW_HEIGHT }
-  }, [merges, labels])
+  }, [merges, labels, heightScale])
 
   const height = layout.plotBottom + AXIS_HEIGHT
   const axisY = layout.plotBottom + 4
@@ -85,16 +89,16 @@ function Dendrogram({ merges, labels, titles = labels, ariaLabel }: DendrogramPr
         aria-label={ariaLabel}
         viewBox={`0 0 ${DENDROGRAM_WIDTH} ${height}`}
         width="100%"
-        style={{ display: 'block', fontSize: 12 }}
+        style={{ display: 'block', fontSize: 13 }}
       >
-        <g fill="none" stroke="currentColor" strokeWidth={1.5}>
+        <g fill="none" stroke="currentColor" strokeWidth={2}>
           {layout.links.map((link) => (
             <path key={link.key} d={link.path} />
           ))}
         </g>
         {layout.positioned.map(({ node, x, y }) =>
           node.children ? (
-            <circle key={node.id} cx={x} cy={y} r={3} fill="currentColor" data-height={node.height}>
+            <circle key={node.id} cx={x} cy={y} r={4} fill="currentColor" data-height={node.height}>
               <title>{`G${node.id}: altura ${node.height.toFixed(3)}, ${node.size} artículos`}</title>
             </circle>
           ) : (
@@ -107,8 +111,8 @@ function Dendrogram({ merges, labels, titles = labels, ariaLabel }: DendrogramPr
           ),
         )}
         <g aria-label="Eje de altura" stroke="currentColor" fill="currentColor">
-          <line x1={heightScale(0)} x2={heightScale(1)} y1={axisY} y2={axisY} />
-          {HEIGHT_TICKS.map((tick) => (
+          <line x1={heightScale(0)} x2={heightScale(maxHeight)} y1={axisY} y2={axisY} />
+          {ticks.map((tick) => (
             <g key={tick}>
               <line x1={heightScale(tick)} x2={heightScale(tick)} y1={axisY} y2={axisY + 4} />
               <text x={heightScale(tick)} y={axisY + 16} textAnchor="middle" stroke="none">
@@ -116,7 +120,7 @@ function Dendrogram({ merges, labels, titles = labels, ariaLabel }: DendrogramPr
               </text>
             </g>
           ))}
-          <text x={(heightScale(0) + heightScale(1)) / 2} y={axisY + 34} textAnchor="middle" stroke="none">
+          <text x={(heightScale(0) + heightScale(maxHeight)) / 2} y={axisY + 34} textAnchor="middle" stroke="none">
             Altura (distancia)
           </text>
         </g>

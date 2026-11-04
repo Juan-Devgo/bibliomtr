@@ -1,6 +1,10 @@
 package co.edu.uniquindio.bibliomtr.algorithms.clustering;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import co.edu.uniquindio.bibliomtr.trace.clustering.LinkageTrace;
+import co.edu.uniquindio.bibliomtr.trace.clustering.LinkageTrace.LinkageStep;
 
 /**
  * Average Linkage, UPGMA (enlace promedio no ponderado) (Requerimiento 3, algoritmo aglomerativo). STUB: el cuerpo de {@link #cluster} lo escribe el
@@ -48,8 +52,110 @@ public final class AverageLinkage implements HierarchicalClustering<LinkageTrace
 	 */
 	@Override
 	public ClusteringResult<LinkageTrace> cluster(double[][] distances) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar AverageLinkage.cluster (ver docs/guia-implementacion.md)");
-	}
+  	int n = distances.length;
+
+  	// Matriz de trabajo entre los grupos vigentes (copia: la entrada no se modifica). Al inicio cada artículo es un grupo.
+  	double[][] current = new double[n][];
+  	List<Integer> clusters = new ArrayList<>(); // ids de los grupos vigentes
+  	List<List<Integer>> members = new ArrayList<>(); // artículos de cada grupo, en orden creciente
+  	for (int i = 0; i < n; i++) {
+  		current[i] = distances[i].clone();
+  		clusters.add(i);
+  		members.add(new ArrayList<>(List.of(i)));
+  	}
+
+  	List<Merge> merges = new ArrayList<>();
+  	List<LinkageStep> steps = new ArrayList<>();
+
+  	// N − 1 fusiones: en cada una el número de grupos baja en 1.
+  	for (int step = 0; step < n - 1; step++) {
+  		int k = clusters.size();
+
+  		// 1. Par (p, q), p < q, de menor distancia. Como el orden de clusters crece con los ids, recorrer p y q en
+  		// orden y reemplazar solo con "<" estricto aplica el desempate lexicográfico.
+  		int p = 0;
+  		int q = 1;
+  		for (int i = 0; i < k; i++) {
+  			for (int j = i + 1; j < k; j++) {
+  				if (current[i][j] < current[p][q]) {
+  					p = i;
+  					q = j;
+  				}
+  			}
+  		}
+  		double height = current[p][q];
+  		int newCluster = n + step;
+
+  		// 2. Grupos que quedan (todos menos p y q) y su distancia al grupo nuevo (Lance-Williams).
+  		List<Integer> remaining = new ArrayList<>();
+  		double[] updatedRow = new double[k - 2];
+  		int sizeP = members.get(p).size();
+  		int sizeQ = members.get(q).size();
+  		int r = 0;
+  		for (int h = 0; h < k; h++) {
+  			if (h == p || h == q) {
+  				continue;
+  			}
+  			remaining.add(clusters.get(h));
+  			updatedRow[r] = (sizeP * current[p][h] + sizeQ * current[q][h]) / (sizeP + sizeQ); // promedio ponderado por tamaños
+  			r++;
+  		}
+
+  		// 3. Se guarda el paso con la matriz ANTES de fusionar y se crea la fusión (left < right).
+  		steps.add(new LinkageStep(clusters, members, current, clusters.get(p), clusters.get(q), height,
+  				newCluster, remaining, updatedRow));
+  		merges.add(new Merge(clusters.get(p), clusters.get(q), height, sizeP + sizeQ));
+
+  		// 4. Nueva matriz de (k − 1) × (k − 1): los grupos que quedan conservan su orden y el nuevo va al final.
+  		double[][] next = new double[k - 1][k - 1];
+  		List<Integer> nextClusters = new ArrayList<>();
+  		List<List<Integer>> nextMembers = new ArrayList<>();
+  		int a = 0;
+  		for (int h = 0; h < k; h++) {
+  			if (h == p || h == q) {
+  				continue;
+  			}
+  			int b = 0;
+  			for (int g = 0; g < k; g++) {
+  				if (g == p || g == q) {
+  					continue;
+  				}
+  				next[a][b] = current[h][g];
+  				b++;
+  			}
+  			next[a][k - 2] = updatedRow[a];
+  			next[k - 2][a] = updatedRow[a];
+  			nextClusters.add(clusters.get(h));
+  			nextMembers.add(members.get(h));
+  			a++;
+  		}
+  		nextClusters.add(newCluster);
+  		nextMembers.add(mergeSorted(members.get(p), members.get(q)));
+  		current = next;
+  		clusters = nextClusters;
+  		members = nextMembers;
+  	}
+  	return new ClusteringResult<>(merges, new LinkageTrace(steps));
+  }
+
+  private static List<Integer> mergeSorted(List<Integer> x, List<Integer> y) {
+  	List<Integer> result = new ArrayList<>(x.size() + y.size());
+  	int i = 0;
+  	int j = 0;
+  	while (i < x.size() && j < y.size()) {
+  		if (x.get(i) <= y.get(j)) {
+  			result.add(x.get(i++));
+  		} else {
+  			result.add(y.get(j++));
+  		}
+  	}
+  	while (i < x.size()) {
+  		result.add(x.get(i++));
+  	}
+  	while (j < y.size()) {
+  		result.add(y.get(j++));
+  	}
+  	return result;
+  }
 
 }

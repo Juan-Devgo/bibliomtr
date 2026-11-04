@@ -2,9 +2,11 @@ import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { D4_MERGES } from '@/test/clusteringFixtures'
 import Dendrogram from './Dendrogram'
-import { HEIGHT_TICKS, heightScale } from './dendrogramScale'
+import { createHeightScale, heightTicks, sharedMaxHeight } from './dendrogramScale'
 
 const LABELS = ['#1 Alfa', '#2 Beta', '#3 Gamma', '#4 Delta']
+
+const heightScale = createHeightScale(1)
 
 describe('Dendrogram (REQ-14, REQ-15, AC-14)', () => {
   it('dibuja una hoja por artículo con su etiqueta y el título completo', () => {
@@ -24,7 +26,7 @@ describe('Dendrogram (REQ-14, REQ-15, AC-14)', () => {
     expect(within(svg).getByText('Delta completo')).toBeInTheDocument()
   })
 
-  it('ubica cada fusión según su altura en la escala [0,1] y conecta los 2N − 2 enlaces', () => {
+  it('ubica cada fusión según su altura en la escala por defecto [0,1] y conecta los 2N − 2 enlaces', () => {
     const { container } = render(
       <Dendrogram merges={D4_MERGES['complete-linkage']} labels={LABELS} ariaLabel="Dendrograma" />,
     )
@@ -38,19 +40,47 @@ describe('Dendrogram (REQ-14, REQ-15, AC-14)', () => {
     expect(screen.getByText('G6: altura 0.700, 4 artículos')).toBeInTheDocument()
   })
 
-  it('todos los dendrogramas comparten el eje de altura 0–1', () => {
+  it('todos los dendrogramas con el mismo maxHeight comparten el eje de altura', () => {
+    const maxHeight = sharedMaxHeight([D4_MERGES['single-linkage'], D4_MERGES.diana])
     const { container } = render(
       <>
-        <Dendrogram merges={D4_MERGES['single-linkage']} labels={LABELS} ariaLabel="A" />
-        <Dendrogram merges={D4_MERGES.diana} labels={LABELS} ariaLabel="B" />
+        <Dendrogram merges={D4_MERGES['single-linkage']} labels={LABELS} ariaLabel="A" maxHeight={maxHeight} />
+        <Dendrogram merges={D4_MERGES.diana} labels={LABELS} ariaLabel="B" maxHeight={maxHeight} />
       </>,
     )
 
     for (const name of ['A', 'B']) {
       const axis = within(screen.getByRole('img', { name })).getByLabelText('Eje de altura')
-      expect(HEIGHT_TICKS.map((tick) => within(axis).getByText(String(tick)))).toHaveLength(5)
+      expect(heightTicks(maxHeight).map((tick) => within(axis).getByText(String(tick)))).not.toHaveLength(0)
     }
-    expect(heightScale.domain()).toEqual([0, 1])
     expect(container.querySelectorAll('svg')).toHaveLength(2)
+  })
+
+  it('con maxHeight menor que 1 la fusión más alta llega al final del eje', () => {
+    const maxHeight = sharedMaxHeight([[{ left: 0, right: 1, height: 0.047, size: 2 }]])
+    const scale = createHeightScale(maxHeight)
+    const { container } = render(
+      <Dendrogram
+        merges={[{ left: 0, right: 1, height: 0.047, size: 2 }]}
+        labels={['#1 Alfa', '#2 Beta']}
+        ariaLabel="Dendrograma"
+        maxHeight={maxHeight}
+      />,
+    )
+
+    expect(maxHeight).toBe(0.05)
+    expect(Number(container.querySelector('circle')?.getAttribute('cx'))).toBeCloseTo(scale(0.047))
+    expect(scale(0.047)).toBeGreaterThan(createHeightScale(1)(0.5))
+  })
+})
+
+describe('sharedMaxHeight (REQ-14)', () => {
+  it('redondea hacia arriba la mayor altura de todas las listas', () => {
+    expect(sharedMaxHeight([[{ left: 0, right: 1, height: 0.03, size: 2 }], [{ left: 0, right: 1, height: 0.047, size: 2 }]])).toBe(0.05)
+  })
+
+  it('vale 1 sin fusiones o con todas las alturas en 0', () => {
+    expect(sharedMaxHeight([])).toBe(1)
+    expect(sharedMaxHeight([[{ left: 0, right: 1, height: 0, size: 2 }]])).toBe(1)
   })
 })

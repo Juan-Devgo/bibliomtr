@@ -16,6 +16,8 @@ interface DendrogramCardProps {
   articles: readonly ArticleSummary[]
   /** Se llama al pedir la traza de este algoritmo; sin ella no se muestra el botón. */
   onShowTrace?: () => void
+  /** Altura máxima del eje, común a las 4 tarjetas (REQ-14). */
+  maxHeight: number
 }
 
 /**
@@ -27,7 +29,7 @@ interface DendrogramCardProps {
  *
  * Complejidad por render: O(N) en tiempo y espacio con CALCULADO y O(1) con PENDIENTE.
  */
-function DendrogramCard({ result, articles, onShowTrace }: DendrogramCardProps) {
+function DendrogramCard({ result, articles, onShowTrace, maxHeight }: DendrogramCardProps) {
   const calculated = result.status === 'CALCULADO' && result.merges !== null
 
   return (
@@ -52,6 +54,7 @@ function DendrogramCard({ result, articles, onShowTrace }: DendrogramCardProps) 
             labels={articles.map(leafLabel)}
             titles={articles.map((article) => article.title)}
             ariaLabel={`Dendrograma: ${result.label}`}
+            maxHeight={maxHeight}
           />
         </>
       ) : (

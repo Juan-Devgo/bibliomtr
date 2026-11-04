@@ -62,7 +62,7 @@ describe('ClusteringSection (REQ-13, REQ-14, REQ-18, REQ-19, REQ-22, AC-13, AC-1
     for (const svg of svgs) {
       expect(within(svg).getByText('#11 Generative AI in education')).toBeInTheDocument()
       expect(within(svg).getByText('Large language models as teaching assistants in programming courses')).toBeInTheDocument()
-      expect(within(svg).getByLabelText('Eje de altura')).toHaveTextContent('00.250.50.751')
+      expect(within(svg).getByLabelText('Eje de altura')).toHaveTextContent('00.20.40.60.8')
     }
   })
 

@@ -1,18 +1,39 @@
 import { scaleLinear } from 'd3'
+import type { Merge } from '@/types/clustering'
 
 /** Ancho del lienzo del dendrograma en unidades del viewBox; el SVG se adapta al ancho del contenedor. */
-export const DENDROGRAM_WIDTH = 640
+export const DENDROGRAM_WIDTH = 580
 
 /** Espacio de las etiquetas de las hojas, a la izquierda. */
-const LABEL_WIDTH = 300
+const LABEL_WIDTH = 290
 
-/** Margen derecho, para que la marca 1 del eje no se corte. */
+/** Margen derecho, para que la última marca del eje no se corte. */
 const RIGHT_MARGIN = 24
 
-/** Marcas del eje de alturas: la misma escala [0,1] en todos los dendrogramas (spec 003, REQ-14). */
-export const HEIGHT_TICKS: readonly number[] = [0, 0.25, 0.5, 0.75, 1]
+/** Cantidad aproximada de marcas del eje de alturas. */
+const TICK_COUNT = 5
 
-/** Escala de alturas [0,1] → posición horizontal, compartida por todos los dendrogramas (REQ-14). */
-export const heightScale = scaleLinear()
-  .domain([0, 1])
-  .range([LABEL_WIDTH, DENDROGRAM_WIDTH - RIGHT_MARGIN])
+/** Altura máxima del eje cuando ninguna fusión tiene altura positiva (distancias todas 0). */
+const DEFAULT_MAX_HEIGHT = 1
+
+/**
+ * Altura máxima del eje, común a los dendrogramas de una misma vista (spec 003, REQ-14): la mayor altura de sus
+ * fusiones redondeada hacia arriba a un valor "limpio" (p. ej. 0.047 → 0.05). Sin fusiones con altura positiva
+ * devuelve 1.
+ */
+export function sharedMaxHeight(mergeLists: readonly (readonly Merge[])[]): number {
+  const max = Math.max(0, ...mergeLists.flatMap((merges) => merges.map((merge) => merge.height)))
+  return max > 0 ? scaleLinear().domain([0, max]).nice(TICK_COUNT - 1).domain()[1] : DEFAULT_MAX_HEIGHT
+}
+
+/** Escala de alturas [0, maxHeight] → posición horizontal. */
+export function createHeightScale(maxHeight: number) {
+  return scaleLinear()
+    .domain([0, maxHeight])
+    .range([LABEL_WIDTH, DENDROGRAM_WIDTH - RIGHT_MARGIN])
+}
+
+/** Marcas del eje de alturas para [0, maxHeight]. */
+export function heightTicks(maxHeight: number): number[] {
+  return createHeightScale(maxHeight).ticks(TICK_COUNT)
+}

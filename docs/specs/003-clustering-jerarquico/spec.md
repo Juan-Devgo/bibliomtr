@@ -48,7 +48,7 @@
 - REQ-11 (US-4): La API recibe los identificadores de 2 a 20 artículos distintos y una de las 8 fuentes de similitud del Requerimiento 1, y devuelve para cada uno de los 4 algoritmos su dendrograma y su estado; la traza de un algoritmo se pide aparte con los mismos artículos y la misma fuente.
 - REQ-12 (US-4): Una solicitud con menos de 2 artículos, más de 20, identificadores repetidos o inexistentes, o una fuente desconocida, se rechaza con HTTP 400 y un mensaje en español.
 - REQ-13 (US-4): La página de similitud textual tiene una sección de clustering que aparece tras una comparación, agrupa los mismos artículos de esa comparación y ofrece un selector con las 8 fuentes, con SPECTER2 (coseno) por defecto.
-- REQ-14 (US-4): La sección muestra los dendrogramas de los 4 algoritmos a la vez en una cuadrícula de 2×2 (una columna en pantallas angostas), con la misma escala de altura [0,1] y una hoja por artículo etiquetada con su título.
+- REQ-14 (US-4): La sección muestra los dendrogramas de los 4 algoritmos a la vez en una cuadrícula de 2×2 (una columna en pantallas angostas), con el mismo eje de altura [0, mayor altura de las fusiones de los 4 resultados] y una hoja por artículo etiquetada con su título.
 - REQ-15 (US-4): La interfaz solo dibuja el dendrograma que devuelve la API; no calcula fusiones, alturas, cortes ni grupos.
 - REQ-16 (US-5): La traza de cada algoritmo contiene, por cada paso, la matriz de distancias entre los grupos vigentes, el par fusionado (o el grupo dividido en DIANA), su distancia y la fila de distancias recalculada.
 - REQ-17 (US-5): La interfaz muestra la traza de un algoritmo paso a paso con la fórmula de su distancia entre grupos en KaTeX.
@@ -72,7 +72,7 @@
 - AC-11 (US-4): Given 5 artículos comparados y la fuente SPECTER2 (coseno) implementada, when se pide el clustering, then la respuesta contiene 4 resultados con un dendrograma de 4 fusiones por cada algoritmo implementado.
 - AC-12 (US-4): Given una solicitud con 1 artículo, 21 artículos, ids repetidos, un id inexistente o una fuente desconocida, when se envía, then responde HTTP 400 con mensaje en español.
 - AC-13 (US-4): Given una comparación hecha en la página de similitud textual, when el usuario cambia la fuente en la sección de clustering, then se dibujan los 4 resultados para esa fuente con los mismos artículos de la comparación.
-- AC-14 (US-4): Given dendrogramas de algoritmos distintos, when se muestran, then comparten la escala de altura [0,1] y cada hoja muestra el título de su artículo.
+- AC-14 (US-4): Given dendrogramas de algoritmos distintos, when se muestran, then comparten el eje de altura [0, mayor altura de sus fusiones] y cada hoja muestra el título de su artículo.
 - AC-15 (US-5): Given un algoritmo implementado, when el usuario abre su traza, then la interfaz muestra cada paso con la matriz entre grupos, el par fusionado, su distancia, la fila recalculada y la fórmula en KaTeX.
 - AC-16 (US-6): Given que solo Average Linkage está implementado, when se pide el clustering, then Average devuelve su dendrograma y los otros 3 aparecen como "Pendiente de implementar: <archivo>#<método>".
 - AC-17 (US-6): Given una fuente de similitud cuyo stub del Requerimiento 1 no está implementado, when se pide el clustering con esa fuente, then la sección muestra que la fuente está pendiente con su "<archivo>#<método>" y no dibuja dendrogramas.
@@ -97,5 +97,6 @@
 - 2026-11-02. Q: ¿Qué traza devuelve cada algoritmo? A: La matriz de distancias entre grupos de cada paso, el par fusionado (o el grupo dividido), su distancia y la fila recalculada.
 - 2026-11-02. Q: ¿Corte del dendrograma? A: No; la interfaz solo dibuja.
 - 2026-11-02. Q: ¿Disposición de los dendrogramas? A: Los 4 a la vez en una cuadrícula de 2×2 con escala de altura común [0,1].
+- 2026-11-04. Q: ¿Sigue siendo [0,1] la escala común? A: No; con distancias de embeddings todas las fusiones caían en [0, 0.05] y los grupos no se distinguían. Ahora el eje es [0, M], con M la mayor altura de las fusiones de los resultados CALCULADOS redondeada hacia arriba a un valor limpio (1 si ninguna es positiva), común a las 4 tarjetas. Reemplaza la respuesta anterior.
 - 2026-11-02. Q: ¿La traza viene con los dendrogramas? A: No; se pide aparte por algoritmo, con los mismos artículos y fuente.
 - 2026-11-02. Q: ¿Cómo se manejan los tests rojos y el aviso de pendiente? A: Igual que en la spec 001: etiqueta de tests de estudiante aparte, estado PENDIENTE con "<archivo>#<método>".
