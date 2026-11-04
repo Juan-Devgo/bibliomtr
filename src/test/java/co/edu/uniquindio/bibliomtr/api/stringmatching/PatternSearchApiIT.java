@@ -301,9 +301,9 @@ class PatternSearchApiIT {
 		assertThat((String) JsonPath.read(body, "$.pattern")).isEqualTo(" ");
 		for (int r = 0; r < SLUGS.length; r++) {
 			String path = "$.algorithms[" + r + "]";
-			assertThat((List<Integer>) JsonPath.read(body, path + ".articles[2].positions"))
+			assertThat(JsonPath.<List<Integer>>read(body, path + ".articles[2].positions"))
 					.containsExactly(6, 14, 18, 27);
-			assertThat((List<Integer>) JsonPath.read(body, path + ".articles[3].positions")).isEmpty();
+			assertThat(JsonPath.<List<Integer>>read(body, path + ".articles[3].positions")).isEmpty();
 			assertThat((Integer) JsonPath.read(body, path + ".articles[0].count")).isEqualTo(36);
 		}
 	}
