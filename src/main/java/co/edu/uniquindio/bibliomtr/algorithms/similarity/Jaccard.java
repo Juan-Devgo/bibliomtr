@@ -1,6 +1,9 @@
 package co.edu.uniquindio.bibliomtr.algorithms.similarity;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import co.edu.uniquindio.bibliomtr.trace.similarity.JaccardTrace;
 
@@ -44,8 +47,30 @@ public final class Jaccard implements SequenceSimilarity<JaccardTrace> {
 	 */
 	@Override
 	public SimilarityResult<JaccardTrace> compare(List<String> a, List<String> b) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar Jaccard.compare (ver docs/guia-implementacion.md)");
+	  // Conjuntos A y B en orden de primera aparición (las repeticiones no cuentan).
+		Set<String> setA = new LinkedHashSet<>(a);
+		Set<String> setB = new LinkedHashSet<>(b);
+	
+		// A ∩ B: los símbolos de A que también están en B.
+		List<String> intersection = new ArrayList<>();
+		for (String symbol : setA) {
+			if (setB.contains(symbol)) {
+				intersection.add(symbol);
+			}
+		}
+	
+		// A ∪ B: primero los de A y luego los de B que no estaban en A.
+		List<String> union = new ArrayList<>(setA);
+		for (String symbol : setB) {
+			if (!setA.contains(symbol)) {
+				union.add(symbol);
+			}
+		}
+	
+		// J = |A ∩ B| / |A ∪ B|; dos conjuntos vacíos son idénticos.
+		double jaccard = union.isEmpty() ? 1.0 : (double) intersection.size() / union.size();
+		JaccardTrace trace = new JaccardTrace(new ArrayList<>(setA), new ArrayList<>(setB), intersection, union);
+		return new SimilarityResult<>(jaccard, jaccard, trace);
 	}
 
 }

@@ -41,8 +41,35 @@ public final class CosineSimilarity implements VectorSimilarity<CosineTrace> {
 	 */
 	@Override
 	public SimilarityResult<CosineTrace> compare(float[] a, float[] b) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar CosineSimilarity.compare (ver docs/guia-implementacion.md)");
+  	if (a.length != b.length || a.length == 0) {
+  		throw new IllegalArgumentException("Los vectores deben tener la misma dimensión mayor que 0");
+  	}
+  	int dimension = a.length;
+
+  	// Un solo recorrido: productos aᵢ·bᵢ (su suma es el producto punto) y sumas de cuadrados para las normas.
+  	double[] products = new double[dimension];
+  	double dotProduct = 0.0;
+  	double sumSquaresA = 0.0;
+  	double sumSquaresB = 0.0;
+  	for (int i = 0; i < dimension; i++) {
+  		double x = a[i];
+  		double y = b[i];
+  		products[i] = x * y;
+  		dotProduct += products[i];
+  		sumSquaresA += x * x;
+  		sumSquaresB += y * y;
+  	}
+  	double normA = Math.sqrt(sumSquaresA);
+  	double normB = Math.sqrt(sumSquaresB);
+
+  	// cos = a·b / (‖a‖ ‖b‖). Con un vector nulo el ángulo no está definido: se toma 0.
+  	double cosine = 0.0;
+  	if (normA != 0.0 && normB != 0.0) {
+  		// El redondeo puede dar 1.0000000000000002: se lleva a [−1, 1].
+  		cosine = Math.max(-1.0, Math.min(1.0, dotProduct / (normA * normB)));
+  	}
+  	double similarity = (1.0 + cosine) / 2.0; // [−1, 1] → [0, 1]
+  	return new SimilarityResult<>(cosine, similarity, new CosineTrace(dimension, products, dotProduct, normA, normB));
 	}
 
 }

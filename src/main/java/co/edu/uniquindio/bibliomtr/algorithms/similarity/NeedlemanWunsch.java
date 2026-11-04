@@ -2,6 +2,9 @@ package co.edu.uniquindio.bibliomtr.algorithms.similarity;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Deque;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 import co.edu.uniquindio.bibliomtr.trace.similarity.NeedlemanWunschTrace;
 
@@ -81,8 +84,84 @@ public final class NeedlemanWunsch implements SequenceSimilarity<NeedlemanWunsch
 	 */
 	@Override
 	public SimilarityResult<NeedlemanWunschTrace> compare(List<String> a, List<String> b) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar NeedlemanWunsch.compare (ver docs/guia-implementacion.md)");
+	  int m = a.size();
+		int n = b.size();
+		int gap = scoring.gap();
+
+		// F[i][j] = mejor puntaje de alinear a[0..i) con b[0..j); moves[i][j] = movimiento que lo logró.
+		int[][] f = new int[m + 1][n + 1];
+		String[][] moves = new String[m + 1][n + 1];
+
+		// Casos base: alinear un prefijo con la secuencia vacía es solo poner gaps. moves[0][0] queda en null.
+		for (int i = 1; i <= m; i++) {
+			f[i][0] = i * gap;
+			moves[i][0] = "UP";
+		}
+		for (int j = 1; j <= n; j++) {
+			f[0][j] = j * gap;
+			moves[0][j] = "LEFT";
+		}
+
+		for (int i = 1; i <= m; i++) {
+			for (int j = 1; j <= n; j++) {
+				int pairScore = a.get(i - 1).equals(b.get(j - 1)) ? scoring.match() : scoring.mismatch(); // s(aᵢ, bⱼ)
+				int diagonal = f[i - 1][j - 1] + pairScore;
+				int up = f[i - 1][j] + gap;
+				int left = f[i][j - 1] + gap;
+
+				// Desempate fijo: DIAG, luego UP, luego LEFT (solo gana otro movimiento si es estrictamente mejor).
+				int best = diagonal;
+				String move = "DIAG";
+				if (up > best) {
+					best = up;
+					move = "UP";
+				}
+				if (left > best) {
+					best = left;
+					move = "LEFT";
+				}
+				f[i][j] = best;
+				moves[i][j] = move;
+			}
+		}
+
+		// Reconstrucción: desde [m][n] hasta [0][0] siguiendo los movimientos; se arma de atrás hacia adelante.
+		Deque<NeedlemanWunschTrace.AlignedPair> reversed = new ArrayDeque<>();
+		int i = m;
+		int j = n;
+		while (i > 0 || j > 0) {
+			String move = moves[i][j];
+			if (move.equals("DIAG")) {
+				reversed.addFirst(new NeedlemanWunschTrace.AlignedPair(a.get(i - 1), b.get(j - 1)));
+				i--;
+				j--;
+			} else if (move.equals("UP")) {
+				reversed.addFirst(new NeedlemanWunschTrace.AlignedPair(a.get(i - 1), null)); // a con gap
+				i--;
+			} else {
+				reversed.addFirst(new NeedlemanWunschTrace.AlignedPair(null, b.get(j - 1))); // gap con b
+				j--;
+			}
+		}
+
+		// Cotas: el mejor caso alinea min(m, n) pares que coinciden y deja el resto en gaps; el peor, los mismos
+		// pares como sustituciones. Con (1, −1, −1) dan 2·min − max y −max.
+		int shorter = Math.min(m, n);
+		int longer = Math.max(m, n);
+		int maxScore = shorter * scoring.match() + (longer - shorter) * gap;
+		int minScore = shorter * scoring.mismatch() + (longer - shorter) * gap;
+
+		int score = f[m][n];
+		double similarity;
+		if (m == 0 && n == 0) {
+			similarity = 1.0;
+		} else if (maxScore == minScore) {
+			similarity = 0.0; // solo una secuencia vacía
+		} else {
+			similarity = (double) (score - minScore) / (maxScore - minScore);
+		}
+		NeedlemanWunschTrace trace = new NeedlemanWunschTrace(a, b, scoring, f, moves, new ArrayList<>(reversed), score, minScore, maxScore);
+		return new SimilarityResult<>(score, similarity, trace);
 	}
 
 }

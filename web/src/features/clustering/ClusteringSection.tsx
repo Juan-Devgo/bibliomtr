@@ -5,6 +5,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useMemo, useRef, useState } from 'react'
 import { useClustering } from '@/api/useClustering'
+import { sharedMaxHeight } from '@/components/dendrogramScale'
 import { formatMs } from '@/features/similarity-matrix/resultFormat'
 import { DEFAULT_SOURCE, type ClusteringAlgorithmSlug } from '@/types/clustering'
 import type { ArticleSummary, SimilarityAlgorithmSlug } from '@/types/similarity'
@@ -22,9 +23,10 @@ interface ClusteringSectionProps {
  * REQ-22).
  *
  * Agrupa los mismos artículos de la comparación con la fuente elegida (SPECTER2 coseno por defecto) y dibuja los
- * 4 dendrogramas a la vez: una columna en pantallas angostas y 2×2 desde `md`. Muestra "Preparación: <ms>"
- * (preprocesamiento y matriz de similitud) aparte del tiempo de cada algoritmo. Si la fuente está pendiente
- * muestra su ubicación y ningún dendrograma. Los errores de la API se muestran con su mensaje en español.
+ * 4 dendrogramas a la vez: una columna en pantallas angostas y 2×2 desde `md`, todos con el mismo eje de altura
+ * [0, mayor altura de las fusiones] (`sharedMaxHeight`). Muestra "Preparación: <ms>" (preprocesamiento y matriz de
+ * similitud) aparte del tiempo de cada algoritmo. Si la fuente está pendiente muestra su ubicación y ningún
+ * dendrograma. Los errores de la API se muestran con su mensaje en español.
  *
  * Debajo está el visor de traza: "Ver traza" en una tarjeta elige ese algoritmo y desplaza el visor a la vista.
  * Cambiar la fuente limpia el algoritmo elegido, porque la traza depende de la fuente.
@@ -35,6 +37,10 @@ function ClusteringSection({ articles }: ClusteringSectionProps) {
   const { data, isFetching, isError, error } = useClustering(articleIds, source)
   const [traceAlgorithm, setTraceAlgorithm] = useState<ClusteringAlgorithmSlug | null>(null)
   const traceRef = useRef<HTMLDivElement>(null)
+  const maxHeight = useMemo(
+    () => sharedMaxHeight(data?.results.map((result) => result.merges ?? []) ?? []),
+    [data],
+  )
 
   const changeSource = (next: SimilarityAlgorithmSlug) => {
     setSource(next)
@@ -48,8 +54,8 @@ function ClusteringSection({ articles }: ClusteringSectionProps) {
 
   return (
     <Stack component="section" aria-label="Clustering jerárquico" spacing={2}>
-      <Typography variant="h5" component="h2">
-        Clustering jerárquico
+      <Typography variant="h4" component="h2">
+        Requerimiento 3: Clustering jerárquico
       </Typography>
       <Typography color="text.secondary">
         Agrupa los artículos de la comparación con Single, Complete y Average Linkage y con DIANA, sobre la distancia
@@ -89,6 +95,7 @@ function ClusteringSection({ articles }: ClusteringSectionProps) {
                     key={result.algorithm}
                     result={result}
                     articles={data.articles}
+                    maxHeight={maxHeight}
                     onShowTrace={() => showTrace(result.algorithm)}
                   />
                 ))}

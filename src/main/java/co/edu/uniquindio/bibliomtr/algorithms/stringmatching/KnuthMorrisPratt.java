@@ -1,7 +1,12 @@
 package co.edu.uniquindio.bibliomtr.algorithms.stringmatching;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import co.edu.uniquindio.bibliomtr.trace.stringmatching.KmpPreprocessing;
+import co.edu.uniquindio.bibliomtr.trace.stringmatching.KmpPreprocessing.PrefixStep;
 import co.edu.uniquindio.bibliomtr.trace.stringmatching.KmpTrace;
+import co.edu.uniquindio.bibliomtr.trace.stringmatching.KmpTrace.KmpComparison;
 
 /**
  * Knuth-Morris-Pratt (KMP) (Requerimiento 4). STUB: los cuerpos de {@link #preprocess} y {@link #search} los
@@ -62,8 +67,37 @@ public final class KnuthMorrisPratt implements StringMatcher<KmpPreprocessing, K
 	 */
 	@Override
 	public KmpPreprocessing preprocess(String pattern, MatchOptions options) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar KnuthMorrisPratt.preprocess (ver docs/guia-implementacion.md § 11)");
+  	if (pattern == null || pattern.isEmpty()) {
+  		throw new IllegalArgumentException("El patrón no puede ser nulo ni vacío");
+  	}
+  	int m = pattern.length();
+  	int[] pi = new int[m]; // π[0] = 0 siempre: un prefijo propio de un solo carácter es vacío
+  	List<PrefixStep> steps = new ArrayList<>();
+
+  	for (int i = 1; i < m; i++) {
+  		char character = pattern.charAt(i);
+  		int k = pi[i - 1]; // longitud del mejor borde de P[0..i−1]; se intenta extenderlo con P[i]
+  		// Los candidatos solo se guardan si se pidió traza: así la medición de tiempos no paga por ellos.
+  		List<Integer> candidates = options.recordTrace() ? new ArrayList<>() : null;
+  		while (true) {
+  			if (candidates != null) {
+  				candidates.add(k);
+  			}
+  			if (pattern.charAt(k) == character) {
+  				pi[i] = k + 1; // el borde de longitud k se extiende
+  				break;
+  			}
+  			if (k == 0) {
+  				pi[i] = 0; // ya no hay borde más corto que probar
+  				break;
+  			}
+  			k = pi[k - 1]; // siguiente borde más largo de P[0..k−1]
+  		}
+  		if (candidates != null) {
+  			steps.add(new PrefixStep(i, character, candidates, pi[i]));
+  		}
+  	}
+  	return new KmpPreprocessing(pattern, pi, steps);
 	}
 
 	/**
@@ -78,8 +112,51 @@ public final class KnuthMorrisPratt implements StringMatcher<KmpPreprocessing, K
 	 */
 	@Override
 	public MatchResult<KmpTrace> search(String text, KmpPreprocessing preprocessed, MatchOptions options) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar KnuthMorrisPratt.search (ver docs/guia-implementacion.md § 11)");
+  	String pattern = preprocessed.pattern();
+  	int[] pi = preprocessed.pi();
+  	int n = text.length();
+  	int m = pattern.length();
+  	List<Integer> positions = new ArrayList<>();
+  	List<KmpComparison> comparisons = new ArrayList<>();
+
+  	if (n >= m) {
+  		int i = 0; // índice en el texto: nunca disminuye
+  		int j = 0; // caracteres de P ya coincidentes con el texto que termina en i − 1
+  		while (i < n) {
+  			int comparedI = i;
+  			int comparedJ = j;
+  			char textChar = text.charAt(i);
+  			char patternChar = pattern.charAt(j);
+  			int shift = i - j; // alineación actual del patrón sobre el texto
+  			boolean matched = textChar == patternChar;
+  			Integer fallbackTo = null;
+  			Integer occurrence = null;
+
+  			if (matched) {
+  				if (j == m - 1) {
+  					// Patrón completo: ocurrencia en s. j ← π[m−1] reutiliza el borde para hallar las solapadas.
+  					occurrence = shift;
+  					positions.add(shift);
+  					j = pi[m - 1];
+  					fallbackTo = j;
+  				} else {
+  					j++;
+  				}
+  				i++;
+  			} else if (j > 0) {
+  				j = pi[j - 1]; // desajuste: el patrón se desliza sin retroceder i
+  				fallbackTo = j;
+  			} else {
+  				i++; // desajuste con j = 0: no hay nada que reutilizar
+  			}
+  			if (options.recordTrace()) {
+  				comparisons.add(new KmpComparison(comparedI, comparedJ, shift, textChar, patternChar, matched,
+  						fallbackTo, occurrence));
+  			}
+  		}
+  	}
+  	KmpTrace trace = options.recordTrace() ? new KmpTrace(comparisons, positions) : null;
+  	return new MatchResult<>(positions, List.of(), trace);
 	}
 
 }

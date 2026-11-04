@@ -1,7 +1,14 @@
 package co.edu.uniquindio.bibliomtr.algorithms.stringmatching;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import co.edu.uniquindio.bibliomtr.trace.stringmatching.BoyerMoorePreprocessing;
 import co.edu.uniquindio.bibliomtr.trace.stringmatching.BoyerMooreTrace;
+import co.edu.uniquindio.bibliomtr.trace.stringmatching.BoyerMooreTrace.Alignment;
+import co.edu.uniquindio.bibliomtr.trace.stringmatching.BoyerMooreTrace.CharComparison;
 
 /**
  * Boyer-Moore (Requerimiento 4). STUB: los cuerpos de {@link #preprocess} y {@link #search} los escribe el
@@ -73,8 +80,61 @@ public final class BoyerMoore implements StringMatcher<BoyerMoorePreprocessing, 
 	 */
 	@Override
 	public BoyerMoorePreprocessing preprocess(String pattern, MatchOptions options) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar BoyerMoore.preprocess (ver docs/guia-implementacion.md § 11)");
+
+  	if (pattern == null || pattern.isEmpty()) {
+  		throw new IllegalArgumentException("El patrón no puede ser nulo ni vacío");
+  	}
+  	int m = pattern.length();
+
+  	// Carácter malo: última posición de cada carácter de P. Re-insertar una clave existente conserva su lugar
+  	// en el LinkedHashMap, así que el orden queda por primera aparición. Un carácter ausente vale −1 y no se guarda.
+  	Map<Character, Integer> lastOccurrence = new LinkedHashMap<>();
+  	for (int k = 0; k < m; k++) {
+  		lastOccurrence.put(pattern.charAt(k), k);
+  	}
+
+  	// Bordes: f[i] = inicio del borde más ancho de P[i..m−1] (f[m] = m + 1 por convención).
+  	// shift[i] = desplazamiento de la regla del sufijo bueno cuando el desajuste ocurre en la posición i − 1.
+  	int[] borderPositions = new int[m + 1];
+  	int[] shift = new int[m + 1];
+  	int i = m;
+  	int j = m + 1;
+  	borderPositions[i] = j;
+  	while (i > 0) {
+  		// Mientras el carácter anterior al sufijo no coincida con el anterior al borde, el borde no se extiende:
+  		// ese sufijo reaparece desplazado j − i (caso 1: el sufijo coincidente reaparece en otro lugar de P).
+  		while (j <= m && pattern.charAt(i - 1) != pattern.charAt(j - 1)) {
+  			if (shift[j] == 0) {
+  				shift[j] = j - i;
+  			}
+  			j = borderPositions[j];
+  		}
+  		i--;
+  		j--;
+  		borderPositions[i] = j;
+  	}
+
+  	// Caso 2: sufijos que no reaparecen. Se rellenan con el borde más ancho de todo P que encaje como prefijo.
+  	j = borderPositions[0];
+  	for (i = 0; i <= m; i++) {
+  		if (shift[i] == 0) {
+  			shift[i] = j;
+  		}
+  		if (i == j) {
+  			j = borderPositions[j];
+  		}
+  	}
+
+  	// La tabla del sufijo bueno se indexa por la posición j del desajuste: shift[j + 1].
+  	int[] goodSuffixShift = new int[m];
+  	for (int k = 0; k < m; k++) {
+  		goodSuffixShift[k] = shift[k + 1];
+  	}
+
+  	int patternBorder = m - borderPositions[0]; // longitud del borde propio más largo de P
+  	int matchShift = m - patternBorder; // salto tras una ocurrencia completa
+
+  	return new BoyerMoorePreprocessing(pattern, lastOccurrence, borderPositions, goodSuffixShift, patternBorder, matchShift);
 	}
 
 	/**
@@ -88,10 +148,57 @@ public final class BoyerMoore implements StringMatcher<BoyerMoorePreprocessing, 
 	 * @return posiciones ascendentes, colisiones vacías y la traza {@link BoyerMooreTrace} (o {@code null})
 	 */
 	@Override
-	public MatchResult<BoyerMooreTrace> search(String text, BoyerMoorePreprocessing preprocessed,
-			MatchOptions options) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar BoyerMoore.search (ver docs/guia-implementacion.md § 11)");
+	public MatchResult<BoyerMooreTrace> search(String text, BoyerMoorePreprocessing preprocessed, MatchOptions options) {
+	
+    String pattern = preprocessed.pattern();
+		Map<Character, Integer> lastOccurrence = preprocessed.lastOccurrence();
+		int[] goodSuffixShift = preprocessed.goodSuffixShift();
+		int matchShift = preprocessed.matchShift();
+		int n = text.length();
+		int m = pattern.length();
+		List<Integer> positions = new ArrayList<>();
+		List<Alignment> alignments = new ArrayList<>();
+
+		int s = 0; // alineación: P[0] sobre T[s]
+		while (s <= n - m) {
+			List<CharComparison> comparisons = new ArrayList<>();
+			int j = m - 1;
+			// Se compara de derecha a izquierda hasta el primer desajuste o hasta agotar el patrón.
+			while (j >= 0) {
+				char textChar = text.charAt(s + j);
+				char patternChar = pattern.charAt(j);
+				boolean matched = textChar == patternChar;
+				if (options.recordTrace()) {
+					comparisons.add(new CharComparison(j, s + j, textChar, patternChar, matched));
+				}
+				if (!matched) {
+					break;
+				}
+				j--;
+			}
+
+			if (j < 0) {
+				// Ocurrencia: se salta m − borde(P) para no perder las solapadas.
+				positions.add(s);
+				if (options.recordTrace()) {
+					alignments.add(new Alignment(s, comparisons, null, true, null, matchShift, matchShift));
+				}
+				s += matchShift;
+			} else {
+				// Desajuste en j: carácter malo j − last(T[s + j]) (last = −1 si no está en P) y sufijo bueno de la tabla.
+				Integer last = lastOccurrence.get(text.charAt(s + j));
+				int badCharacterShift = j - (last == null ? -1 : last);
+				int suffixShift = goodSuffixShift[j];
+				int appliedShift = Math.max(Math.max(badCharacterShift, suffixShift), 1); // siempre avanza
+				if (options.recordTrace()) {
+					alignments.add(new Alignment(s, comparisons, j, false, badCharacterShift, suffixShift, appliedShift));
+				}
+				s += appliedShift;
+			}
+		}
+		
+		BoyerMooreTrace trace = options.recordTrace() ? new BoyerMooreTrace(alignments, positions) : null;
+		return new MatchResult<>(positions, List.of(), trace);
 	}
 
 }
