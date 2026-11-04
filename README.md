@@ -60,6 +60,31 @@ La pestaña "Búsqueda Patrones" busca un patrón de 1 a 200 caracteres (sin rec
 - Stubs a implementar: `src/main/java/co/edu/uniquindio/bibliomtr/algorithms/stringmatching/` (`KnuthMorrisPratt`, `BoyerMoore`, `RabinKarp`), métodos `preprocess` y `search`. Mientras no estén implementados, aparecen como "Pendiente de implementar".
 - Definiciones formales, trazas, casos a mano, ejemplo sobre un fragmento real, tests y benchmark JMH: [`docs/guia-implementacion.md`](docs/guia-implementacion.md) § 11.
 
+## Despliegue en AWS (Requerimiento 5)
+
+El stack de producción (`compose.prod.yaml`) levanta `web` (nginx con HTTPS de Let's Encrypt), `api`, `ollama` y `certbot` en una EC2; PostgreSQL vive en RDS. La infraestructura de AWS se crea a mano en la consola siguiendo el runbook [`docs/despliegue-aws.md`](docs/despliegue-aws.md); el repositorio no ejecuta nada contra AWS.
+
+```bash
+cp .env.prod.example .env      # completar los valores CAMBIAR_...; .env queda fuera de git
+cp /ruta/a/los/pdf/*.pdf corpus/
+scripts/bootstrap-ec2.sh       # en la EC2 (Ubuntu 26.04), como usuario normal con sudo; idempotente
+```
+
+Variables de `.env.prod.example`:
+
+| Variable | Uso |
+|---|---|
+| `SPRING_DATASOURCE_URL` | URL JDBC de RDS con `sslmode=require` |
+| `SPRING_DATASOURCE_USERNAME` | usuario maestro de RDS |
+| `SPRING_DATASOURCE_PASSWORD` | contraseña del usuario maestro |
+| `BIBLIOMTR_CORPUS_DIR` | ruta del corpus dentro del contenedor `api` (`/data/corpus`, montada desde `./corpus`) |
+| `BIBLIOMTR_OLLAMA_URL` | URL de Ollama en la red interna (`http://ollama:11434`) |
+| `DOMAIN` | dominio para HTTPS; vacío = solo HTTP |
+| `CERTBOT_EMAIL` | correo de Let's Encrypt (obligatorio con `DOMAIN`) |
+| `CERTBOT_STAGING` | `1` usa el entorno de pruebas de Let's Encrypt; `0` producción |
+
+Validación sin AWS: `docker compose --env-file .env.prod.example -f compose.prod.yaml config`, `scripts/check-nginx.sh` y `./gradlew test --tests DeploymentInvariantsTest --tests DeploymentRunbookTest --rerun`.
+
 ## Stack completo
 
 ```bash
