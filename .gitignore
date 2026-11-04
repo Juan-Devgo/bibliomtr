@@ -43,3 +43,5 @@ out/
 # Modelo ONNX: se descarga con scripts/download-model.sh
 /src/main/resources/models/
 .env
+# La plantilla de producción sí se versiona (sin secretos); el `.env` real queda ignorado.
+!.env.prod.example

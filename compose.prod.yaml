@@ -1,0 +1,72 @@
+# Stack de producción (spec 005): EC2 con Docker Compose y base de datos en RDS (fuera de Compose).
+# Independiente de compose.yaml y compose.dev.yaml. Configuración desde `.env` (ver .env.prod.example).
+# Validar sin secretos: docker compose --env-file .env.prod.example -f compose.prod.yaml config
+name: bibliomtr
+
+services:
+  # Solo genera vectores (nomic-embed-text:v1.5); el modelo lo descarga la API con POST /api/pull.
+  ollama:
+    image: 'ollama/ollama:0.12.6'
+    environment:
+      - 'OLLAMA_NUM_PARALLEL=1'
+      - 'OLLAMA_MAX_LOADED_MODELS=1'
+    volumes:
+      - ollama-data:/root/.ollama
+    mem_limit: 1024m
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'ollama', 'list']
+      interval: 15s
+      timeout: 10s
+      start_period: 20s
+      retries: 10
+
+  api:
+    build: .
+    environment:
+      - 'SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:?Defina SPRING_DATASOURCE_URL en .env}'
+      - 'SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:?Defina SPRING_DATASOURCE_USERNAME en .env}'
+      - 'SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:?Defina SPRING_DATASOURCE_PASSWORD en .env}'
+      - 'BIBLIOMTR_CORPUS_DIR=${BIBLIOMTR_CORPUS_DIR:?Defina BIBLIOMTR_CORPUS_DIR en .env}'
+      - 'BIBLIOMTR_OLLAMA_URL=${BIBLIOMTR_OLLAMA_URL:?Defina BIBLIOMTR_OLLAMA_URL en .env}'
+      # El heap acota también el proceso hijo JMH, que hereda la variable.
+      - 'JAVA_TOOL_OPTIONS=-Xmx768m -XX:+ExitOnOutOfMemoryError'
+    volumes:
+      - ./corpus:${BIBLIOMTR_CORPUS_DIR:-/data/corpus}:ro
+    mem_limit: 2048m
+    restart: unless-stopped
+    healthcheck:
+      # La imagen no garantiza curl ni wget: se usa bash con /dev/tcp.
+      test:
+        - 'CMD'
+        - 'bash'
+        - '-c'
+        - 'exec 3<>/dev/tcp/127.0.0.1/8080 && printf "GET /api/actuator/health HTTP/1.0\r\nHost: localhost\r\n\r\n" >&3 && grep -q "\"status\":\"UP\"" <&3'
+      interval: 15s
+      timeout: 10s
+      start_period: 120s
+      retries: 10
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  web:
+    build: ./web
+    ports:
+      - '80:80'
+    environment:
+      - 'DOMAIN=${DOMAIN:-}'
+    mem_limit: 128m
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '--spider', 'http://127.0.0.1/healthz']
+      interval: 15s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  ollama-data:
