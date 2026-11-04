@@ -52,10 +52,15 @@ services:
 
   web:
     build: ./web
+    # 443 se publica siempre; nginx solo escucha en él en modo HTTPS (DOMAIN definido y certificado emitido).
     ports:
       - '80:80'
+      - '443:443'
     environment:
       - 'DOMAIN=${DOMAIN:-}'
+    volumes:
+      - letsencrypt:/etc/letsencrypt:ro
+      - certbot-webroot:/var/www/certbot:ro
     mem_limit: 128m
     restart: unless-stopped
     healthcheck:
@@ -68,5 +73,32 @@ services:
       api:
         condition: service_healthy
 
+  # Emite y renueva el certificado (HTTP-01 por webroot); web lo recarga sin reiniciarse.
+  certbot:
+    image: 'certbot/certbot:v5.1.0'
+    entrypoint: ['/bin/sh', '/scripts/certbot-loop.sh']
+    environment:
+      - 'DOMAIN=${DOMAIN:-}'
+      - 'CERTBOT_EMAIL=${CERTBOT_EMAIL:-}'
+      - 'CERTBOT_STAGING=${CERTBOT_STAGING:-0}'
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot-webroot:/var/www/certbot
+      - ./scripts/certbot-loop.sh:/scripts/certbot-loop.sh:ro
+    mem_limit: 128m
+    restart: unless-stopped
+    healthcheck:
+      # El ciclo actualiza /tmp/certbot-alive cada 60 s.
+      test: ['CMD-SHELL', 'find /tmp/certbot-alive -mmin -3 | grep -q .']
+      interval: 60s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    depends_on:
+      web:
+        condition: service_healthy
+
 volumes:
   ollama-data:
+  letsencrypt:
+  certbot-webroot:
