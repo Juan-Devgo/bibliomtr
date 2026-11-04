@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { D4_MERGES } from '@/test/clusteringFixtures'
 import Dendrogram from './Dendrogram'
-import { createHeightScale, heightTicks, sharedMaxHeight } from './dendrogramScale'
+import { axisMaxHeight, createHeightScale, heightTicks } from './dendrogramScale'
 
 const LABELS = ['#1 Alfa', '#2 Beta', '#3 Gamma', '#4 Delta']
 
@@ -26,9 +26,9 @@ describe('Dendrogram (REQ-14, REQ-15, AC-14)', () => {
     expect(within(svg).getByText('Delta completo')).toBeInTheDocument()
   })
 
-  it('ubica cada fusión según su altura en la escala por defecto [0,1] y conecta los 2N − 2 enlaces', () => {
+  it('ubica cada fusión según su altura en una escala [0,1] y conecta los 2N − 2 enlaces', () => {
     const { container } = render(
-      <Dendrogram merges={D4_MERGES['complete-linkage']} labels={LABELS} ariaLabel="Dendrograma" />,
+      <Dendrogram merges={D4_MERGES['complete-linkage']} labels={LABELS} ariaLabel="Dendrograma" maxHeight={1} />,
     )
 
     const nodes = [...container.querySelectorAll('circle')]
@@ -40,31 +40,32 @@ describe('Dendrogram (REQ-14, REQ-15, AC-14)', () => {
     expect(screen.getByText('G6: altura 0.700, 4 artículos')).toBeInTheDocument()
   })
 
-  it('todos los dendrogramas con el mismo maxHeight comparten el eje de altura', () => {
-    const maxHeight = sharedMaxHeight([D4_MERGES['single-linkage'], D4_MERGES.diana])
-    const { container } = render(
+  it('cada dendrograma ajusta su eje a sus propias alturas', () => {
+    const small = [{ left: 0, right: 1, height: 0.047, size: 2 }]
+    const large = [{ left: 0, right: 1, height: 0.8, size: 2 }]
+    render(
       <>
-        <Dendrogram merges={D4_MERGES['single-linkage']} labels={LABELS} ariaLabel="A" maxHeight={maxHeight} />
-        <Dendrogram merges={D4_MERGES.diana} labels={LABELS} ariaLabel="B" maxHeight={maxHeight} />
+        <Dendrogram merges={small} labels={['#1 Alfa', '#2 Beta']} ariaLabel="A" />
+        <Dendrogram merges={large} labels={['#1 Alfa', '#2 Beta']} ariaLabel="B" />
       </>,
     )
 
-    for (const name of ['A', 'B']) {
+    for (const [name, merges] of [['A', small], ['B', large]] as const) {
+      const maxHeight = axisMaxHeight(merges)
       const axis = within(screen.getByRole('img', { name })).getByLabelText('Eje de altura')
       expect(heightTicks(maxHeight).map((tick) => within(axis).getByText(String(tick)))).not.toHaveLength(0)
     }
-    expect(container.querySelectorAll('svg')).toHaveLength(2)
+    expect(heightTicks(axisMaxHeight(small))).not.toEqual(heightTicks(axisMaxHeight(large)))
   })
 
-  it('con maxHeight menor que 1 la fusión más alta llega al final del eje', () => {
-    const maxHeight = sharedMaxHeight([[{ left: 0, right: 1, height: 0.047, size: 2 }]])
+  it('sin maxHeight la fusión más alta llega al final del eje del propio dendrograma', () => {
+    const maxHeight = axisMaxHeight([{ left: 0, right: 1, height: 0.047, size: 2 }])
     const scale = createHeightScale(maxHeight)
     const { container } = render(
       <Dendrogram
         merges={[{ left: 0, right: 1, height: 0.047, size: 2 }]}
         labels={['#1 Alfa', '#2 Beta']}
         ariaLabel="Dendrograma"
-        maxHeight={maxHeight}
       />,
     )
 
@@ -74,13 +75,13 @@ describe('Dendrogram (REQ-14, REQ-15, AC-14)', () => {
   })
 })
 
-describe('sharedMaxHeight (REQ-14)', () => {
-  it('redondea hacia arriba la mayor altura de todas las listas', () => {
-    expect(sharedMaxHeight([[{ left: 0, right: 1, height: 0.03, size: 2 }], [{ left: 0, right: 1, height: 0.047, size: 2 }]])).toBe(0.05)
+describe('axisMaxHeight (REQ-14)', () => {
+  it('redondea hacia arriba la mayor altura de las fusiones', () => {
+    expect(axisMaxHeight([{ left: 0, right: 1, height: 0.03, size: 2 }, { left: 2, right: 3, height: 0.047, size: 3 }])).toBe(0.05)
   })
 
   it('vale 1 sin fusiones o con todas las alturas en 0', () => {
-    expect(sharedMaxHeight([])).toBe(1)
-    expect(sharedMaxHeight([[{ left: 0, right: 1, height: 0, size: 2 }]])).toBe(1)
+    expect(axisMaxHeight([])).toBe(1)
+    expect(axisMaxHeight([{ left: 0, right: 1, height: 0, size: 2 }])).toBe(1)
   })
 })

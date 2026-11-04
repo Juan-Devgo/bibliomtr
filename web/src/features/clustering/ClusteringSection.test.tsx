@@ -1,6 +1,7 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { axisMaxHeight, heightTicks } from '@/components/dendrogramScale'
 import {
   calculatedDendrogram,
   CLUSTERING_ARTICLES,
@@ -59,10 +60,12 @@ describe('ClusteringSection (REQ-13, REQ-14, REQ-18, REQ-19, REQ-22, AC-13, AC-1
     expect(svgs.map((svg) => svg.getAttribute('aria-label'))).toEqual(
       Object.values(CLUSTERING_ALGORITHM_LABELS).map((label) => `Dendrograma: ${label}`),
     )
-    for (const svg of svgs) {
+    const results = CLUSTERING_D4.results
+    for (const [index, svg] of svgs.entries()) {
+      const ticks = heightTicks(axisMaxHeight(results[index].merges ?? [])).join('')
       expect(within(svg).getByText('#11 Generative AI in education')).toBeInTheDocument()
       expect(within(svg).getByText('Large language models as teaching assistants in programming courses')).toBeInTheDocument()
-      expect(within(svg).getByLabelText('Eje de altura')).toHaveTextContent('00.20.40.60.8')
+      expect(within(svg).getByLabelText('Eje de altura')).toHaveTextContent(ticks)
     }
   })
 

@@ -3,7 +3,7 @@ import { cluster, hierarchy } from 'd3'
 import { useMemo } from 'react'
 import { toHierarchy, type DendrogramNode } from '@/features/clustering/dendrogramTree'
 import type { Merge } from '@/types/clustering'
-import { createHeightScale, DENDROGRAM_WIDTH, heightTicks } from './dendrogramScale'
+import { axisMaxHeight, createHeightScale, DENDROGRAM_WIDTH, heightTicks } from './dendrogramScale'
 
 /** Alto de la fila de cada hoja. */
 const ROW_HEIGHT = 30
@@ -21,7 +21,7 @@ interface DendrogramProps {
   titles?: readonly string[]
   /** Nombre accesible del SVG. */
   ariaLabel: string
-  /** Altura máxima del eje; los dendrogramas que se comparan deben recibir la misma. Por defecto, 1. */
+  /** Altura máxima del eje. Por defecto, la mayor altura de las fusiones de este dendrograma (`axisMaxHeight`). */
   maxHeight?: number
 }
 
@@ -42,13 +42,15 @@ interface Link {
  * Dendrograma horizontal dibujado con D3 (spec 003, REQ-14, REQ-15).
  *
  * D3 solo ubica los nodos: `hierarchy` + `cluster` reparten las hojas en filas, en el orden de los hijos que da
- * la API, y `scaleLinear` lleva la altura de cada fusión, en [0, `maxHeight`], al eje horizontal. No calcula fusiones,
+ * la API, y `scaleLinear` lleva la altura de cada fusión, en [0, `maxHeight`], al eje horizontal, que se ajusta a las alturas
+ * de este dendrograma. No calcula fusiones,
  * alturas, cortes ni grupos, ni reordena las hojas. Cada hoja muestra su etiqueta y, al pasar el cursor, el
  * título completo; cada fusión, su grupo, altura y tamaño.
  *
  * Complejidad por render: O(N) en tiempo y espacio, con N hojas.
  */
-function Dendrogram({ merges, labels, titles = labels, ariaLabel, maxHeight = 1 }: DendrogramProps) {
+function Dendrogram({ merges, labels, titles = labels, ariaLabel, maxHeight: maxHeightProp }: DendrogramProps) {
+  const maxHeight = useMemo(() => maxHeightProp ?? axisMaxHeight(merges), [maxHeightProp, merges])
   const heightScale = useMemo(() => createHeightScale(maxHeight), [maxHeight])
   const ticks = useMemo(() => heightTicks(maxHeight), [maxHeight])
   const layout = useMemo(() => {
