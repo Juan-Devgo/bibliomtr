@@ -1,6 +1,12 @@
 package co.edu.uniquindio.bibliomtr.algorithms.similarity;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import co.edu.uniquindio.bibliomtr.trace.similarity.TfIdfCosineTrace;
 
@@ -52,8 +58,84 @@ public final class TfIdfCosineSimilarity implements CorpusSimilarity<TfIdfCosine
 	 */
 	@Override
 	public SimilarityResult<TfIdfCosineTrace> compare(List<String> a, List<String> b, List<List<String>> corpus) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar TfIdfCosineSimilarity.compare (ver docs/guia-implementacion.md)");
+
+	  int documentCount = corpus.size();
+
+		// Vocabulario del par: unión de los términos de a y b, en orden de primera aparición.
+		Set<String> vocabularySet = new LinkedHashSet<>(a);
+		vocabularySet.addAll(b);
+		List<String> vocabulary = new ArrayList<>(vocabularySet);
+		int size = vocabulary.size();
+
+		// df(t): en cuántos documentos del corpus aparece t (cada documento cuenta una vez).
+		int[] documentFrequency = new int[size];
+		for (List<String> document : corpus) {
+			Set<String> terms = new HashSet<>(document);
+			for (int k = 0; k < size; k++) {
+				if (terms.contains(vocabulary.get(k))) {
+					documentFrequency[k]++;
+				}
+			}
+		}
+
+		// idf(t) = ln(N / df(t)). Un término que no está en el corpus (df = 0) no tiene idf definido: se toma 0
+		// para que no aporte (nunca ocurre en la aplicación, donde a y b son parte del corpus).
+		double[] idf = new double[size];
+		for (int k = 0; k < size; k++) {
+			idf[k] = documentFrequency[k] == 0 ? 0.0 : Math.log((double) documentCount / documentFrequency[k]);
+		}
+
+		// tf(t, d) = f(t, d) / |d| y peso w = tf · idf, para cada documento del par.
+		double[] tfA = termFrequency(a, vocabulary);
+		double[] tfB = termFrequency(b, vocabulary);
+		double[] weightsA = new double[size];
+		double[] weightsB = new double[size];
+		double dotProduct = 0.0;
+		double sumSquaresA = 0.0;
+		double sumSquaresB = 0.0;
+		for (int k = 0; k < size; k++) {
+			weightsA[k] = tfA[k] * idf[k];
+			weightsB[k] = tfB[k] * idf[k];
+			dotProduct += weightsA[k] * weightsB[k];
+			sumSquaresA += weightsA[k] * weightsA[k];
+			sumSquaresB += weightsB[k] * weightsB[k];
+		}
+		double normA = Math.sqrt(sumSquaresA);
+		double normB = Math.sqrt(sumSquaresB);
+
+		// cos = (wa · wb) / (‖wa‖ ‖wb‖). Dos documentos vacíos son idénticos; una norma 0 en otro caso da 0.
+		double cosine;
+		if (a.isEmpty() && b.isEmpty()) {
+			cosine = 1.0;
+		} else if (normA == 0.0 || normB == 0.0) {
+			cosine = 0.0;
+		} else {
+			// Los pesos no son negativos, así que cos ∈ [0, 1]; el min absorbe el error de redondeo (1.0000000000000002).
+			cosine = Math.min(1.0, dotProduct / (normA * normB));
+		}
+		
+		TfIdfCosineTrace trace = new TfIdfCosineTrace(vocabulary, documentCount, documentFrequency, idf, tfA, tfB, weightsA, weightsB, dotProduct, normA, normB);
+		return new SimilarityResult<>(cosine, cosine, trace);
+	}
+
+	private static double[] termFrequency(List<String> document, List<String> vocabulary) {
+
+	  Map<String, Integer> counts = new HashMap<>();
+		for (String term : document) {
+			counts.merge(term, 1, Integer::sum);
+		}
+		
+		double[] tf = new double[vocabulary.size()];
+		if (document.isEmpty()) {
+			return tf;
+		}
+		
+		for (int k = 0; k < tf.length; k++) {
+			Integer count = counts.get(vocabulary.get(k));
+			tf[k] = count == null ? 0.0 : (double) count / document.size();
+		}
+		
+		return tf;
 	}
 
 }

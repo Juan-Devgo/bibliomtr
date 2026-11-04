@@ -56,8 +56,36 @@ public final class Levenshtein implements SequenceSimilarity<LevenshteinTrace> {
 	 */
 	@Override
 	public SimilarityResult<LevenshteinTrace> compare(List<String> a, List<String> b) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar Levenshtein.compare (ver docs/guia-implementacion.md)");
+	
+		int m = a.size();
+		int n = b.size();
+	
+		// Matriz D de (m + 1) × (n + 1): D[i][j] = distancia entre los primeros i símbolos de a y los primeros j de b.
+		int[][] d = new int[m + 1][n + 1];
+	
+		// Casos base: transformar a[0..i) en la secuencia vacía cuesta i eliminaciones; la vacía en b[0..j) cuesta j inserciones.
+		for (int i = 0; i <= m; i++) {
+			d[i][0] = i;
+		}
+		for (int j = 0; j <= n; j++) {
+			d[0][j] = j;
+		}
+	
+		// Caso general: la mejor de las tres operaciones sobre el último símbolo de cada prefijo.
+		for (int i = 1; i <= m; i++) {
+			for (int j = 1; j <= n; j++) {
+				int substitution = a.get(i - 1).equals(b.get(j - 1)) ? 0 : 1; // [aᵢ ≠ bⱼ]
+				int delete = d[i - 1][j] + 1;
+				int insert = d[i][j - 1] + 1;
+				int replace = d[i - 1][j - 1] + substitution;
+				d[i][j] = Math.min(Math.min(delete, insert), replace);
+			}
+		}
+	
+		int distance = d[m][n];
+		int maxLength = Math.max(m, n);
+		// similitud = 1 − D[m][n] / max(m, n); dos secuencias vacías son idénticas.
+		double similarity = maxLength == 0 ? 1.0 : 1.0 - (double) distance / maxLength;
+		return new SimilarityResult<>(distance, similarity, new LevenshteinTrace(a, b, d, distance, maxLength));
 	}
-
 }

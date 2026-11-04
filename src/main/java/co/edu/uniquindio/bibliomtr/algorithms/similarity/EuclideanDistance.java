@@ -41,8 +41,23 @@ public final class EuclideanDistance implements VectorSimilarity<EuclideanTrace>
 	 */
 	@Override
 	public SimilarityResult<EuclideanTrace> compare(float[] a, float[] b) {
-		throw new UnsupportedOperationException(
-				"TODO estudiante: implementar EuclideanDistance.compare (ver docs/guia-implementacion.md)");
+  	if (a.length != b.length || a.length == 0) {
+  		throw new IllegalArgumentException("Los vectores deben tener la misma dimensión mayor que 0");
+  	}
+  	int dimension = a.length;
+
+  	// (aᵢ − bᵢ)² por coordenada y su suma; la diferencia se hace en double para no perder precisión.
+  	double[] squaredDifferences = new double[dimension];
+  	double sumOfSquares = 0.0;
+  	for (int i = 0; i < dimension; i++) {
+  		double difference = (double) a[i] - (double) b[i];
+  		squaredDifferences[i] = difference * difference;
+  		sumOfSquares += squaredDifferences[i];
+  	}
+
+  	double distance = Math.sqrt(sumOfSquares); // d(a, b) = √Σ(aᵢ − bᵢ)²
+  	double similarity = 1.0 / (1.0 + distance); // [0, ∞) → (0, 1]; d = 0 da 1
+  	return new SimilarityResult<>(distance, similarity, new EuclideanTrace(dimension, squaredDifferences, sumOfSquares));
 	}
 
 }
